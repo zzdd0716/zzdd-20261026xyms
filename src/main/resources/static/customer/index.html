@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>扫码点餐</title>
-  <link rel="stylesheet" href="/customer/css/style.css?v=20260904b">
+  <link rel="stylesheet" href="/customer/css/style.css?v=20260904c">
 </head>
 <body>
 <div id="app" v-cloak>
@@ -56,7 +56,7 @@
     </div>
     <!-- 底部购物车栏 -->
     <div class="cart-bar" v-if="cartCount>0">
-      <div class="cart-total" @click="switchPage('cart')">
+      <div class="cart-total" @click="openCartSheet">
         <span class="cart-icon">🛒</span>
         <div>
           <div class="cart-total-amount">¥{{cartTotal.toFixed(2)}}</div>
@@ -191,10 +191,41 @@
       <button class="modal-btn" @click="afterOrderSuccess">查看订单</button>
     </div>
   </div>
+
+  <!-- 购物车上拉弹窗（不跳转页面即可查看/删除） -->
+  <div class="sheet-mask" v-if="cartSheetVisible" @click.self="closeCartSheet">
+    <div class="cart-sheet">
+      <div class="cart-sheet-head">
+        <span>已选菜品（{{cartCount}} 件）</span>
+        <span class="cart-sheet-close" @click="closeCartSheet">✕</span>
+      </div>
+      <div class="cart-sheet-list">
+        <div class="cart-item" v-for="item in cartItems" :key="item.key">
+          <div class="cart-item-main">
+            <div class="cart-item-name">{{item.name}}</div>
+            <div class="cart-item-spec" v-if="item.specText">{{item.specText}}</div>
+            <input class="cart-item-remark" v-model="item.remark" placeholder="备注">
+          </div>
+          <div class="cart-item-price">¥{{Number(item.price).toFixed(2)}}</div>
+          <div class="stepper">
+            <button class="step-btn minus" @click="cartDec(item)">−</button>
+            <span class="qty">{{item.qty}}</span>
+            <button class="step-btn plus" @click="cartInc(item)">＋</button>
+          </div>
+          <button class="cart-item-del" @click="cartRemove(item)">删除</button>
+        </div>
+        <div v-if="cartCount===0" class="empty-tip">购物车是空的</div>
+      </div>
+      <div class="cart-sheet-foot">
+        <span>合计 <b class="sheet-total">¥{{cartTotal.toFixed(2)}}</b></span>
+        <button class="sheet-goto" @click="goSettle">去结算</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="/admin/vendor/vue.global.prod.js"></script>
-<script src="/customer/js/api.js?v=20260904c"></script>
-<script src="/customer/js/app.js?v=20260904c"></script>
+<script src="/customer/js/api.js?v=20260904d"></script>
+<script src="/customer/js/app.js?v=20260904d"></script>
 </body>
 </html>

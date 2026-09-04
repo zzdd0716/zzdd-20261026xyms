@@ -209,7 +209,27 @@ const CustomerApp = {
     function cartDec(item) {
       if (!cart[item.key]) return;
       cart[item.key].qty--;
-      if (cart[item.key].qty <= 0) delete cart[item.key];
+      if (cart[item.key].qty <= 0) {
+        delete cart[item.key];
+        if (cartCount.value === 0) cartSheetVisible.value = false;
+      }
+    }
+    // 购物车上拉弹窗：点击底部购物车图标打开（不跳转页面），可查看/删除/去结算
+    const cartSheetVisible = ref(false);
+    function openCartSheet() {
+      if (cartCount.value === 0) return;
+      cartSheetVisible.value = true;
+    }
+    function closeCartSheet() {
+      cartSheetVisible.value = false;
+    }
+    function cartRemove(item) {
+      delete cart[item.key];
+      if (cartCount.value === 0) cartSheetVisible.value = false;
+    }
+    function goSettle() {
+      cartSheetVisible.value = false;
+      page.value = 'cart';
     }
 
     // ===== 下单 =====
@@ -278,6 +298,7 @@ const CustomerApp = {
       shopName, tableNo, page,
       categories, allDishes, activeCate, menuLoading, filteredDishes,
       cartItems, cartCount, cartTotal, cartQty, cartInc, cartDec,
+      cartSheetVisible, openCartSheet, closeCartSheet, cartRemove, goSettle,
       // 选规格弹窗
       specVisible, specDish, specSelections, specQty, specRemark,
       specUnitPrice, specTotalPrice,
