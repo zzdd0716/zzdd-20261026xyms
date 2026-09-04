@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>扫码点餐</title>
+  <link rel="stylesheet" href="/customer/css/style.css?v=20260904b">
+</head>
+<body>
+<div id="app" v-cloak>
+  <!-- 顶部：门店信息 -->
+  <div class="header">
+    <div class="header-shop">
+      <div class="shop-name">🍜 {{shopName}}</div>
+      <div class="shop-meta">桌号：{{tableNo}} · 扫码点餐</div>
+    </div>
+  </div>
+
+  <!-- 页面切换：菜单 / 购物车 / 我的订单 -->
+  <div class="nav-tabs">
+    <div class="nav-tab" :class="{active: page==='menu'}" @click="switchPage('menu')">点餐</div>
+    <div class="nav-tab" :class="{active: page==='cart'}" @click="switchPage('cart')">
+      购物车<template v-if="cartCount>0">（{{cartCount}}）</template>
+    </div>
+    <div class="nav-tab" :class="{active: page==='orders'}" @click="switchPage('orders')">我的订单</div>
+  </div>
+
+  <!-- ========== 点餐页 ========== -->
+  <div v-show="page==='menu'" class="page">
+    <!-- 分类横向导航 -->
+    <div class="cate-bar">
+      <div class="cate-item" :class="{active: activeCate===c.id}" v-for="c in categories" :key="c.id"
+           @click="activeCate=c.id">{{c.name}}</div>
+    </div>
+    <!-- 菜品列表 -->
+    <div class="dish-list">
+      <div class="dish-card" v-for="d in filteredDishes" :key="d.id">
+        <div class="dish-img">
+          <img v-if="d.image" :src="d.image" :alt="d.name">
+          <div v-else class="dish-img-empty">🍛</div>
+        </div>
+        <div class="dish-info">
+          <div class="dish-name">{{d.name}}</div>
+          <div class="dish-desc" v-if="d.description">{{d.description}}</div>
+          <div class="dish-sold" v-if="d.soldCount>0">已售 {{d.soldCount}}</div>
+          <div class="dish-price-row">
+            <span class="dish-price">¥{{Number(d.price).toFixed(2)}}</span>
+            <div class="dish-add-area">
+              <span class="dish-picked" v-if="cartQty(d.id)>0">已选 {{cartQty(d.id)}} 份</span>
+              <button class="spec-open-btn" @click="openSpecDialog(d)">选规格</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-if="!menuLoading && filteredDishes.length===0" class="empty-tip">该分类暂无菜品</div>
+    </div>
+    <!-- 底部购物车栏 -->
+    <div class="cart-bar" v-if="cartCount>0">
+      <div class="cart-total" @click="switchPage('cart')">
+        <span class="cart-icon">🛒</span>
+        <div>
+          <div class="cart-total-amount">¥{{cartTotal.toFixed(2)}}</div>
+          <div class="cart-total-count">{{cartCount}} 件</div>
+        </div>
+      </div>
+      <button class="go-cart-btn" @click="switchPage('cart')">去结算</button>
+    </div>
+  </div>
+
+  <!-- ========== 购物车页 ========== -->
+  <div v-show="page==='cart'" class="page">
+    <div v-if="cartCount>0" class="cart-list">
+      <div class="cart-item" v-for="item in cartItems" :key="item.key">
+        <div class="cart-item-main">
+          <div class="cart-item-name">{{item.name}}</div>
+          <div class="cart-item-spec" v-if="item.specText">{{item.specText}}</div>
+          <input class="cart-item-remark" v-model="item.remark" placeholder="备注">
+        </div>
+        <div class="cart-item-price">¥{{Number(item.price).toFixed(2)}}</div>
+        <div class="stepper">
+          <button class="step-btn minus" @click="cartDec(item)">−</button>
+          <span class="qty">{{item.qty}}</span>
+          <button class="step-btn plus" @click="cartInc(item)">＋</button>
+        </div>
+      </div>
+      <div class="cart-summary">
+        <span>共 {{cartCount}} 件</span>
+        <span class="cart-summary-amount">合计 ¥{{cartTotal.toFixed(2)}}</span>
+      </div>
+      <button class="submit-btn" :disabled="submitting" @click="submitOrder">
+        {{submitting ? '提交中…' : '确认下单'}}
+      </button>
+    </div>
+    <div v-else class="empty-tip big">购物车是空的，去点餐吧~</div>
+  </div>
+
+  <!-- ========== 我的订单页 ========== -->
+  <div v-show="page==='orders'" class="page">
+    <div class="orders-list">
+      <div class="order-card" v-for="o in myOrders" :key="o.id" @click="viewOrderDetail(o)">
+        <div class="order-head">
+          <span class="order-no">单号 {{o.orderNo}}</span>
+          <span class="order-status" :class="'st'+o.status">{{statusText(o.status)}}</span>
+        </div>
+        <div class="order-meta">桌号 {{tableNo}} · {{fmtTime(o.createTime)}}</div>
+        <div class="order-foot">
+          <span class="order-view">查看详情 ›</span>
+          <span class="order-amount">¥{{Number(o.totalAmount).toFixed(2)}}</span>
+        </div>
+      </div>
+      <div v-if="!ordersLoading && myOrders.length===0" class="empty-tip big">还没有订单</div>
+    </div>
+  </div>
+
+  <!-- 订单详情弹窗 -->
+  <div class="modal-mask" v-if="orderDetail.visible" @click.self="orderDetail.visible=false">
+    <div class="modal order-detail-modal">
+      <div class="modal-title">订单详情</div>
+      <div class="od-meta">单号：{{orderDetail.order ? orderDetail.order.orderNo : ''}}</div>
+      <div class="od-meta">桌号：{{tableNo}} · {{orderDetail.order ? fmtTime(orderDetail.order.createTime) : ''}}</div>
+      <div class="od-items">
+        <div class="od-item" v-for="it in orderDetail.items" :key="it.id">
+          <div class="od-item-main">
+            <span class="od-item-name">{{it.dishName}}</span>
+            <span v-if="it.specText" class="od-item-spec">{{it.specText}}</span>
+            <span v-if="it.remark" class="od-item-remark">〔{{it.remark}}〕</span>
+          </div>
+          <div class="od-item-right">
+            <span class="od-item-qty">×{{it.quantity}}</span>
+            <span class="od-item-amt">¥{{Number(it.subtotal).toFixed(2)}}</span>
+          </div>
+        </div>
+        <div v-if="orderDetail.items.length===0" class="od-empty">暂无明细</div>
+      </div>
+      <div class="od-total">合计 ¥{{orderDetail.order ? Number(orderDetail.order.totalAmount).toFixed(2) : '0.00'}}</div>
+      <button class="modal-btn" @click="orderDetail.visible=false">关闭</button>
+    </div>
+  </div>
+
+  <!-- 选规格弹窗（含双拼） -->
+  <div class="modal-mask" v-if="specVisible">
+    <div class="modal spec-modal">
+      <div class="spec-modal-head">
+        <div class="spec-modal-title">{{specDish ? specDish.name : ''}}</div>
+        <div class="spec-modal-price">¥{{specUnitPrice.toFixed(2)}}</div>
+      </div>
+      <div class="spec-group" v-for="g in (specDish ? specDish.specs : [])" :key="g.id">
+        <div class="spec-group-head">
+          <span class="spec-group-name">{{g.name}}</span>
+          <span class="spec-group-rule">
+            <template v-if="g.required===1 && g.type!==3">必选</template>
+            <template v-else>可选</template>
+          </span>
+        </div>
+        <div class="spec-options">
+          <div class="spec-option" v-for="o in g.options" :key="o.id"
+               :class="{active: isOptSelected(g,o)}" @click="toggleOpt(g,o)">
+            <span>{{o.name}}</span>
+            <span v-if="Number(o.priceDelta)>0" class="spec-option-delta">+¥{{Number(o.priceDelta).toFixed(2)}}</span>
+          </div>
+        </div>
+      </div>
+      <!-- 口味备注（加入购物车时填写） -->
+      <div class="spec-remark-row">
+        <input v-model="specRemark" class="spec-remark-input" placeholder="备注">
+      </div>
+      <!-- 份数与合计 -->
+      <div class="spec-qty-row">
+        <span class="spec-qty-label">份数</span>
+        <div class="stepper">
+          <button class="step-btn minus" :class="{disabled: specQty<=1}" @click="specQtyDec">−</button>
+          <span class="qty">{{specQty}}</span>
+          <button class="step-btn plus" @click="specQtyInc">＋</button>
+        </div>
+        <span class="spec-qty-total">合计 ¥{{specTotalPrice.toFixed(2)}}</span>
+      </div>
+      <div class="spec-modal-footer">
+        <button class="spec-btn cancel" @click="closeSpecDialog">取消</button>
+        <button class="spec-btn confirm" @click="confirmSpec">加入购物车</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 下单成功弹窗 -->
+  <div class="modal-mask" v-if="orderSuccess.show">
+    <div class="modal">
+      <div class="modal-icon">✅</div>
+      <div class="modal-title">下单成功！</div>
+      <div class="modal-desc">订单已送达后厨，请耐心等待上菜</div>
+      <div class="modal-no">订单号：{{orderSuccess.orderNo}}</div>
+      <button class="modal-btn" @click="afterOrderSuccess">查看订单</button>
+    </div>
+  </div>
+</div>
+
+<script src="/admin/vendor/vue.global.prod.js"></script>
+<script src="/customer/js/api.js?v=20260904c"></script>
+<script src="/customer/js/app.js?v=20260904c"></script>
+</body>
+</html>

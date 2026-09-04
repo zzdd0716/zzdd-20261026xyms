@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>商家管理后台 - 二维码点餐系统</title>
+  <link rel="stylesheet" href="/admin/vendor/index.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif; background: #f5f7fa; }
+    #app { height: 100vh; display: flex; }
+    .layout-side { width: 220px; background: #1f2d3d; color: #fff; display: flex; flex-direction: column; }
+    .layout-side .brand { padding: 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .layout-side .brand .brand-title { font-size: 16px; font-weight: 600; color: #fff; }
+    .layout-side .brand .brand-sub { font-size: 12px; color: #8a94a6; margin-top: 4px; }
+    .layout-side .menu { flex: 1; padding: 8px 0; }
+    .layout-side .menu-item { padding: 13px 20px; cursor: pointer; color: #c0c8d4; font-size: 14px; display: flex; align-items: center; transition: all .2s; }
+    .layout-side .menu-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+    .layout-side .menu-item.active { background: #409eff; color: #fff; }
+    .layout-side .menu-item .menu-icon { margin-right: 10px; font-size: 16px; }
+    .layout-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .layout-header { height: 56px; background: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; box-shadow: 0 1px 4px rgba(0,21,41,0.08); }
+    .layout-header .page-title { font-size: 16px; font-weight: 600; color: #303133; }
+    .layout-header .shop-tag { font-size: 13px; color: #909399; }
+    .layout-content { flex: 1; padding: 20px 24px; overflow-y: auto; }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+    .status-tag { font-size: 12px; }
+    .dish-thumb { width: 48px; height: 48px; border-radius: 6px; object-fit: cover; background: #f0f2f5; display: block; }
+    .text-muted { color: #909399; font-size: 12px; }
+    /* 订单列表：下单内容行 */
+    .order-item-line { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; line-height: 1.7; font-size: 13px; }
+    .order-item-name { font-weight: 600; color: #303133; }
+    .order-item-spec { color: #909399; font-size: 12px; }
+    .order-item-remark { color: #e6a23c; font-size: 12px; }
+    .order-item-qty { color: #606266; }
+    /* 收银统计卡片 */
+    .cash-card { text-align: center; }
+    .cash-card-label { font-size: 13px; color: #909399; margin-bottom: 6px; }
+    .cash-card-num { font-size: 22px; font-weight: 700; color: #303133; }
+    .cash-card-sub { font-size: 12px; color: #909399; margin-top: 6px; }
+    .cash-amount { color: #e6a23c; font-weight: 600; }
+    .card-title { font-size: 14px; font-weight: 600; color: #303133; margin-bottom: 12px; }
+    /* 菜品管理分类墙 */
+    .cate-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+    .cate-card { border: 1px solid #ebeef5; border-radius: 12px; padding: 22px 16px; text-align: center; cursor: pointer; transition: all .2s; background: #fff; position: relative; }
+    .cate-card:hover { border-color: #409eff; box-shadow: 0 4px 12px rgba(64,158,255,.15); transform: translateY(-2px); }
+    .cate-card-icon { font-size: 30px; margin-bottom: 8px; }
+    .cate-card-name { font-size: 16px; font-weight: 600; color: #303133; }
+    .cate-card-count { font-size: 12px; color: #909399; margin-top: 4px; }
+    .cate-card-arrow { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: #c0c4cc; font-size: 18px; }
+    .cate-breadcrumb { font-size: 15px; font-weight: 600; color: #303133; }
+    .spec-config { border: 1px dashed #dcdfe6; border-radius: 8px; padding: 12px; margin-bottom: 12px; background: #fafbfc; }
+    .spec-group-row, .spec-opt-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+    .spec-opt-row { margin-left: 20px; }
+    /* 统一圆角按钮（小米式圆角矩形） */
+    .el-button { border-radius: 14px; }
+    .el-button--small { border-radius: 10px; }
+    .el-dialog { border-radius: 12px; }
+    .el-input__wrapper, .el-select__wrapper, .el-textarea__inner { border-radius: 10px; }
+    .el-card { border-radius: 12px; }
+  </style>
+</head>
+<body>
+<div id="app">
+  <!-- 侧边栏 -->
+  <div class="layout-side">
+    <div class="brand">
+      <div class="brand-title">🍜 点餐管理后台</div>
+      <div class="brand-sub">二维码点餐系统</div>
+    </div>
+    <div class="menu">
+      <div class="menu-item" v-for="m in menus" :key="m.key" :class="{active: current==m.key}" @click="switchMenu(m.key)">
+        <span class="menu-icon">{{m.icon}}</span><span>{{m.name}}</span>
+      </div>
+    </div>
+    <div class="brand" style="border-top:1px solid rgba(255,255,255,0.08);border-bottom:none;">
+      <div class="brand-sub">门店 ID：{{shopId}}</div>
+    </div>
+  </div>
+
+  <!-- 主区域 -->
+  <div class="layout-main">
+    <div class="layout-header">
+      <div class="page-title">{{currentTitle}}</div>
+      <div class="shop-tag">接口地址：http://localhost:8080</div>
+    </div>
+    <div class="layout-content">
+      <!-- 菜品管理（先分类墙，再进分类菜品） -->
+      <div v-show="current==='dish'">
+        <!-- 一级：分类墙 -->
+        <div v-if="dishView==='cates'">
+          <div class="toolbar">
+            <div>
+              <el-button type="primary" @click="openDishDialog()">＋ 新增菜品</el-button>
+              <el-button @click="loadDishes">刷新</el-button>
+            </div>
+          </div>
+          <el-card>
+            <div class="cate-grid">
+              <div class="cate-card" v-for="c in categories" :key="c.id" @click="enterDishList(c)">
+                <div class="cate-card-icon">🍽️</div>
+                <div class="cate-card-name">{{c.name}}</div>
+                <div class="cate-card-count">{{cateDishCount(c.id)}} 个菜品</div>
+                <div class="cate-card-arrow">›</div>
+              </div>
+              <div v-if="categories.length===0" class="text-muted" style="grid-column:1/-1;text-align:center;padding:40px 0;">暂无分类，请先到「分类管理」新增分类</div>
+            </div>
+          </el-card>
+        </div>
+        <!-- 二级：分类菜品列表 -->
+        <div v-else>
+          <div class="toolbar">
+            <div>
+              <el-button @click="enterDishCates">← 返回分类</el-button>
+              <el-button type="primary" @click="openDishDialog(null, dishCurrentCate ? dishCurrentCate.id : null)">＋ 新增菜品</el-button>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;">
+              <span class="cate-breadcrumb">{{dishCurrentCate ? dishCurrentCate.name : ''}}</span>
+              <el-input v-model="dishKeyword" placeholder="搜索菜品名称 / 描述" clearable style="width:200px" @clear="clearDishSearch">
+                <template #prefix><span style="color:#909399;">🔍</span></template>
+              </el-input>
+              <el-button size="small" @click="toggleDishPriceSort" :type="dishPriceSort!==''?'primary':''">{{dishPriceSortText}}</el-button>
+            </div>
+          </div>
+          <el-card>
+            <el-table :data="currentCateDishes" border stripe v-loading="dishLoading">
+              <el-table-column label="图片" width="80">
+                <template #default="scope">
+                  <img v-if="scope.row.image" :src="scope.row.image" class="dish-thumb" alt="">
+                  <div v-else class="dish-thumb" style="display:flex;align-items:center;justify-content:center;color:#c0c4cc;">无图</div>
+                </template>
+              </el-table-column>
+              <el-table-column prop="name" label="菜品名称" min-width="120"></el-table-column>
+              <el-table-column prop="price" label="价格(元)" width="90"></el-table-column>
+              <el-table-column prop="stock" label="库存" width="80"></el-table-column>
+              <el-table-column prop="soldCount" label="销量" width="80"></el-table-column>
+              <el-table-column label="状态" width="90">
+                <template #default="scope">
+                  <el-switch :model-value="scope.row.status==1" @change="(v)=>toggleDishStatus(scope.row,v)" active-text="上架" inactive-text="下架" inline-prompt></el-switch>
+                </template>
+              </el-table-column>
+              <el-table-column label="操作" width="160" fixed="right">
+                <template #default="scope">
+                  <el-button size="small" @click="openDishDialog(scope.row)">编辑</el-button>
+                  <el-button size="small" type="danger" @click="deleteDish(scope.row)">删除</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+            <div v-if="currentCateDishes.length===0" class="text-muted" style="padding:20px;">该分类暂无菜品</div>
+          </el-card>
+        </div>
+      </div>
+
+      <!-- 分类管理 -->
+      <div v-show="current==='category'">
+        <div class="toolbar">
+          <div>
+            <el-button type="primary" @click="openCategoryDialog()">＋ 新增分类</el-button>
+            <el-button @click="loadCategories">刷新</el-button>
+          </div>
+        </div>
+        <el-card>
+          <el-table :data="categories" border stripe v-loading="cateLoading">
+            <el-table-column prop="id" label="ID" width="70"></el-table-column>
+            <el-table-column prop="name" label="分类名称" min-width="150"></el-table-column>
+            <el-table-column prop="sortOrder" label="排序值" width="100"></el-table-column>
+            <el-table-column label="状态" width="100">
+              <template #default="scope">
+                <el-tag :type="scope.row.status==1?'success':'info'" size="small">{{scope.row.status==1?'启用':'停用'}}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="160">
+              <template #default="scope">
+                <el-button size="small" @click="openCategoryDialog(scope.row)">编辑</el-button>
+                <el-button size="small" type="danger" @click="deleteCategory(scope.row)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-card>
+      </div>
+
+      <!-- 桌台管理 -->
+      <div v-show="current==='table'">
+        <div class="toolbar">
+          <div>
+            <el-button type="primary" @click="openTableDialog()">＋ 新增桌台</el-button>
+            <el-button @click="loadTables">刷新</el-button>
+          </div>
+        </div>
+        <el-card>
+          <el-table :data="tables" border stripe v-loading="tableLoading">
+            <el-table-column prop="id" label="ID" width="70"></el-table-column>
+            <el-table-column prop="tableNo" label="桌号" min-width="100"></el-table-column>
+            <el-table-column label="状态" width="110">
+              <template #default="scope">
+                <el-tag :type="scope.row.status==1?'success':'warning'" size="small">{{scope.row.status==1?'空闲':'占用/停用'}}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="qrCode" label="桌台二维码" min-width="220" show-overflow-tooltip></el-table-column>
+            <el-table-column label="操作" width="160">
+              <template #default="scope">
+                <el-button size="small" @click="openTableDialog(scope.row)">编辑</el-button>
+                <el-button size="small" type="danger" @click="deleteTable(scope.row)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-card>
+      </div>
+
+      <!-- 订单管理 -->
+      <div v-show="current==='order'">
+        <div class="toolbar">
+          <div>
+            <el-button @click="loadOrders('')" type="primary">全部订单</el-button>
+          </div>
+          <el-button @click="loadOrders('')">刷新</el-button>
+        </div>
+        <el-card>
+          <el-table :data="orders" border stripe v-loading="orderLoading">
+            <el-table-column prop="orderNo" label="订单号" min-width="190" show-overflow-tooltip></el-table-column>
+            <el-table-column label="桌号" width="80">
+              <template #default="scope">{{tableNo(scope.row.tableId)}}</template>
+            </el-table-column>
+            <el-table-column label="下单内容" min-width="280">
+              <template #default="scope">
+                <div v-for="it in (scope.row.items||[])" :key="it.id" class="order-item-line">
+                  <span class="order-item-name">{{it.dishName}}</span>
+                  <span v-if="it.specText" class="order-item-spec">{{it.specText}}</span>
+                  <span v-if="it.remark" class="order-item-remark">〔{{it.remark}}〕</span>
+                  <span class="order-item-qty">×{{it.quantity}}</span>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="totalAmount" label="金额(元)" width="100"></el-table-column>
+            <el-table-column label="状态" width="110">
+              <template #default="scope">
+                <el-tag type="success" size="small">下单成功</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="createTime" label="下单时间" width="170"></el-table-column>
+          </el-table>
+        </el-card>
+      </div>
+
+      <!-- 收银统计 -->
+      <div v-show="current==='cashier'">
+        <div class="toolbar">
+          <div>
+            <el-button v-for="p in cashierPeriods" :key="p.key" @click="switchCashierPeriod(p.key)"
+                       :type="cashierPeriod===p.key?'primary':''">{{p.name}}</el-button>
+          </div>
+          <el-button @click="loadCashier">刷新</el-button>
+        </div>
+        <el-row :gutter="16" style="margin-bottom:16px;" v-if="cashier.data">
+          <el-col :span="6">
+            <el-card class="cash-card">
+              <div class="cash-card-label">总入账</div>
+              <div class="cash-card-num">¥{{Number(cashier.data.totalAmount).toFixed(2)}}</div>
+              <div class="cash-card-sub">{{cashier.data.totalOrders}} 单</div>
+            </el-card>
+          </el-col>
+          <el-col :span="6">
+            <el-card class="cash-card">
+              <div class="cash-card-label">最近{{cashierPeriodName}}入账</div>
+              <div class="cash-card-num">¥{{cashierLatest ? Number(cashierLatest.amount).toFixed(2) : '0.00'}}</div>
+              <div class="cash-card-sub">{{cashierLatest ? cashierLatest.label : '—'}}</div>
+            </el-card>
+          </el-col>
+          <el-col :span="6">
+            <el-card class="cash-card">
+              <div class="cash-card-label">最近{{cashierPeriodName}}订单</div>
+              <div class="cash-card-num">{{cashierLatest ? cashierLatest.count : 0}} 单</div>
+              <div class="cash-card-sub">{{cashierLatest ? cashierLatest.label : '—'}}</div>
+            </el-card>
+          </el-col>
+          <el-col :span="6">
+            <el-card class="cash-card">
+              <div class="cash-card-label">统计周期数</div>
+              <div class="cash-card-num">{{cashier.data.rows.length}} 个</div>
+              <div class="cash-card-sub">{{cashierPeriodName}}入账明细</div>
+            </el-card>
+          </el-col>
+        </el-row>
+        <el-row :gutter="16">
+          <el-col :span="14">
+            <el-card v-loading="cashier.loading">
+              <div class="card-title">入账明细（{{cashierPeriodName}}）</div>
+              <el-table :data="cashier.data && cashier.data.rows ? cashier.data.rows : []" border stripe>
+                <el-table-column prop="label" label="周期" min-width="180"></el-table-column>
+                <el-table-column prop="count" label="订单数" width="110" align="center"></el-table-column>
+                <el-table-column label="入账金额(元)" width="170">
+                  <template #default="scope">
+                    <span class="cash-amount">¥{{Number(scope.row.amount).toFixed(2)}}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column label="占比" min-width="200">
+                  <template #default="scope">
+                    <el-progress :percentage="cashierPercent(scope.row.amount)" :stroke-width="14"></el-progress>
+                  </template>
+                </el-table-column>
+              </el-table>
+              <div v-if="cashier.data && (!cashier.data.rows || cashier.data.rows.length===0)" class="text-muted" style="padding:20px;">暂无入账数据</div>
+            </el-card>
+          </el-col>
+          <el-col :span="10">
+            <el-card v-loading="sales.loading">
+              <div class="card-title">菜品销量占比（{{cashierPeriodName}}）</div>
+              <div id="salesChart" style="height:340px;"></div>
+              <div class="text-muted" style="text-align:center;padding-top:4px;">总销量 {{sales.data ? sales.data.totalQuantity : 0}} 份 · 前5名，其余计入"其他"</div>
+            </el-card>
+          </el-col>
+        </el-row>
+      </div>
+    </div>
+  </div>
+
+  <!-- 菜品弹窗 -->
+  <el-dialog v-model="dishDialog.visible" :title="dishDialog.id?'编辑菜品':'新增菜品'" width="720px" destroy-on-close>
+    <el-form :model="dishDialog" label-width="90px">
+      <el-form-item label="菜品名称" required><el-input v-model="dishDialog.name" placeholder="如：剁椒鱼头"></el-input></el-form-item>
+      <el-form-item label="分类">
+        <el-select v-model="dishDialog.categoryId" placeholder="选择分类" style="width:100%">
+          <el-option v-for="c in categories" :key="c.id" :label="c.name" :value="c.id"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="价格(元)" required><el-input-number v-model="dishDialog.price" :min="0.01" :precision="2" :step="1" style="width:100%"></el-input-number></el-form-item>
+      <el-form-item label="库存"><el-input-number v-model="dishDialog.stock" :min="0" :step="10" style="width:100%"></el-input-number></el-form-item>
+      <el-form-item label="上架"><el-switch v-model="dishDialog.status" :active-value="1" :inactive-value="0"></el-switch></el-form-item>
+      <el-form-item label="图片URL"><el-input v-model="dishDialog.image" placeholder="可选，菜品图片链接"></el-input></el-form-item>
+      <el-form-item label="描述"><el-input v-model="dishDialog.description" type="textarea" :rows="2" placeholder="可选，菜品简介"></el-input></el-form-item>
+      <el-form-item label="规格配置">
+        <div style="width:100%;">
+          <div class="spec-config" v-for="(g, gi) in dishDialog.specs" :key="gi">
+            <div class="spec-group-row">
+              <el-input v-model="g.name" placeholder="规格组名称（辣度/双拼/份量）" style="width:180px"></el-input>
+              <el-select v-model="g.type" style="width:100px" @change="onGroupTypeChange(g)">
+                <el-option :value="1" label="单选"></el-option>
+                <el-option :value="2" label="多选"></el-option>
+              </el-select>
+            </div>
+            <div class="spec-group-row" style="margin-top:6px;">
+              <el-switch v-model="g.required" :active-value="1" :inactive-value="0" active-text="必选"></el-switch>
+              <el-input-number v-model="g.minSelect" :min="0" size="small" style="width:86px"></el-input-number>
+              <span class="text-muted">~</span>
+              <el-input-number v-model="g.maxSelect" :min="0" size="small" style="width:86px"></el-input-number>
+              <el-button size="small" type="danger" @click="removeSpecGroup(g, gi)">删除组</el-button>
+            </div>
+            <div class="spec-opt-row" v-for="(o, oi) in g.options" :key="oi">
+              <el-input v-model="o.name" placeholder="选项名（微辣/大碗/烧鸭）" style="width:170px"></el-input>
+              <el-input-number v-model="o.priceDelta" :min="0" :precision="2" :step="1" size="small" style="width:100px" placeholder="加价"></el-input-number>
+              <el-button size="small" type="danger" @click="removeSpecOption(g, oi)">删除</el-button>
+            </div>
+            <div class="spec-opt-row">
+              <el-button size="small" @click="addSpecOption(g)">＋ 添加选项</el-button>
+            </div>
+          </div>
+          <el-button type="primary" plain size="small" @click="addSpecGroup">＋ 添加规格组</el-button>
+          <div class="text-muted" style="margin-top:6px;">
+            单选=只能选1项；多选=可自由选多项（可设置最少/最多选择数）。加价为所选选项的加价（元）。
+          </div>
+        </div>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button @click="dishDialog.visible=false">取消</el-button>
+      <el-button type="primary" @click="saveDish">保存</el-button>
+    </template>
+  </el-dialog>
+
+  <!-- 分类弹窗 -->
+  <el-dialog v-model="categoryDialog.visible" :title="categoryDialog.id?'编辑分类':'新增分类'" width="420px" destroy-on-close>
+    <el-form :model="categoryDialog" label-width="80px">
+      <el-form-item label="分类名称" required><el-input v-model="categoryDialog.name" placeholder="如：招牌菜"></el-input></el-form-item>
+      <el-form-item label="排序值"><el-input-number v-model="categoryDialog.sortOrder" :min="1" :step="1" style="width:100%"></el-input-number></el-form-item>
+      <el-form-item label="启用"><el-switch v-model="categoryDialog.status" :active-value="1" :inactive-value="0"></el-switch></el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button @click="categoryDialog.visible=false">取消</el-button>
+      <el-button type="primary" @click="saveCategory">保存</el-button>
+    </template>
+  </el-dialog>
+
+  <!-- 桌台弹窗 -->
+  <el-dialog v-model="tableDialog.visible" :title="tableDialog.id?'编辑桌台':'新增桌台'" width="420px" destroy-on-close>
+    <el-form :model="tableDialog" label-width="90px">
+      <el-form-item label="桌号" required><el-input v-model="tableDialog.tableNo" placeholder="如：A01"></el-input></el-form-item>
+      <el-form-item label="状态">
+        <el-select v-model="tableDialog.status" style="width:100%">
+          <el-option :value="1" label="空闲"></el-option>
+          <el-option :value="0" label="占用/停用"></el-option>
+        </el-select>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button @click="tableDialog.visible=false">取消</el-button>
+      <el-button type="primary" @click="saveTable">保存</el-button>
+    </template>
+  </el-dialog>
+
+</div>
+
+<script src="/admin/vendor/vue.global.prod.js"></script>
+<script src="/admin/vendor/element-plus.full.min.js"></script>
+<script src="/admin/vendor/zh-cn.min.js"></script>
+<script src="/admin/vendor/echarts.min.js"></script>
+<script src="/admin/js/api.js?v=20260904k"></script>
+<script src="/admin/js/app.js?v=20260904k"></script>
+</body>
+</html>
