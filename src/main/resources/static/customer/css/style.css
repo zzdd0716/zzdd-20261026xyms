@@ -146,9 +146,9 @@ body { font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
 .cart-item-remark { width: 100%; margin-top: 6px; padding: 6px 10px; border: 1px solid #eee; border-radius: 8px; font-size: 12px; background: #fafafa; outline: none; }
 .cart-item-remark:focus { border-color: #FFA000; background: #fff; }
 
-/* 购物车上拉弹窗（严格贴合顾客端页面容器 480px） */
+/* 购物车上拉弹窗（严格贴合顾客端页面内容区 456px） */
 .sheet-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 60; display: flex; align-items: flex-end; animation: fadeIn 0.2s; }
-.cart-sheet { width: 100%; max-width: 480px; margin: 0 auto; background: #f7f7f7; border-radius: 16px 16px 0 0; padding: 12px 12px 14px; display: flex; flex-direction: column; max-height: 58vh; animation: slideUp 0.25s ease; box-shadow: 0 -4px 20px rgba(0,0,0,0.15); }
+.cart-sheet { width: calc(100% - 24px); max-width: 456px; margin: 0 auto; background: #f7f7f7; border-radius: 16px 16px 0 0; padding: 12px 12px 14px; display: flex; flex-direction: column; max-height: 58vh; animation: slideUp 0.25s ease; box-shadow: 0 -4px 20px rgba(0,0,0,0.15); }
 .cart-sheet-head { display: flex; justify-content: space-between; align-items: center; font-size: 15px; font-weight: 700; color: #333; padding: 4px 4px 10px; }
 .cart-sheet-close { font-size: 20px; color: #999; cursor: pointer; padding: 0 4px; }
 .cart-sheet-list { overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 8px; padding-bottom: 4px; }
