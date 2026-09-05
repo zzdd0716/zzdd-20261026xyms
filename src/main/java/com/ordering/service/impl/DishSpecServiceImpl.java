@@ -32,28 +32,39 @@ public class DishSpecServiceImpl implements DishSpecService {
 
     @Override
     public void fillSpecs(List<Dish> dishes) {
+        fillSpecsInternal(dishes, true);
+    }
+
+    @Override
+    public void fillSpecsForAdmin(List<Dish> dishes) {
+        fillSpecsInternal(dishes, false);
+    }
+
+    private void fillSpecsInternal(List<Dish> dishes, boolean enabledOnly) {
         if (dishes == null || dishes.isEmpty()) {
             return;
         }
         List<Long> dishIds = dishes.stream().map(Dish::getId).collect(Collectors.toList());
-        List<DishSpecGroup> groups = groupMapper.selectList(
-                new LambdaQueryWrapper<DishSpecGroup>()
-                        .in(DishSpecGroup::getDishId, dishIds)
-                        .eq(DishSpecGroup::getStatus, 1)
-                        .orderByAsc(DishSpecGroup::getDishId)
-                        .orderByAsc(DishSpecGroup::getSortOrder)
-        );
+        LambdaQueryWrapper<DishSpecGroup> groupWrapper = new LambdaQueryWrapper<DishSpecGroup>()
+                .in(DishSpecGroup::getDishId, dishIds);
+        if (enabledOnly) {
+            groupWrapper.eq(DishSpecGroup::getStatus, 1);
+        }
+        groupWrapper.orderByAsc(DishSpecGroup::getDishId)
+                .orderByAsc(DishSpecGroup::getSortOrder);
+        List<DishSpecGroup> groups = groupMapper.selectList(groupWrapper);
         if (groups.isEmpty()) {
             return;
         }
         List<Long> groupIds = groups.stream().map(DishSpecGroup::getId).collect(Collectors.toList());
-        List<DishSpecOption> options = optionMapper.selectList(
-                new LambdaQueryWrapper<DishSpecOption>()
-                        .in(DishSpecOption::getGroupId, groupIds)
-                        .eq(DishSpecOption::getStatus, 1)
-                        .orderByAsc(DishSpecOption::getGroupId)
-                        .orderByAsc(DishSpecOption::getSortOrder)
-        );
+        LambdaQueryWrapper<DishSpecOption> optionWrapper = new LambdaQueryWrapper<DishSpecOption>()
+                .in(DishSpecOption::getGroupId, groupIds);
+        if (enabledOnly) {
+            optionWrapper.eq(DishSpecOption::getStatus, 1);
+        }
+        optionWrapper.orderByAsc(DishSpecOption::getGroupId)
+                .orderByAsc(DishSpecOption::getSortOrder);
+        List<DishSpecOption> options = optionMapper.selectList(optionWrapper);
         Map<Long, List<DishSpecOption>> optByGroup = options.stream()
                 .collect(Collectors.groupingBy(DishSpecOption::getGroupId));
         Map<Long, List<DishSpecGroup>> groupsByDish = groups.stream()

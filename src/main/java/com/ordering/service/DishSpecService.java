@@ -14,6 +14,9 @@ public interface DishSpecService {
     /** 批量给菜品填充规格（组+选项，仅启用状态） */
     void fillSpecs(List<Dish> dishes);
 
+    /** 批量给菜品填充规格（组+选项，含停用状态，供商家后台编辑回显） */
+    void fillSpecsForAdmin(List<Dish> dishes);
+
     /** 按菜品ID加载规格（含选项，仅启用状态） */
     List<DishSpecGroup> listGroupsWithOptions(Long dishId);
 

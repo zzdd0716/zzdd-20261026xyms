@@ -75,8 +75,8 @@ public class ShopAdminServiceImpl implements ShopAdminService {
                         .eq(Dish::getShopId, shopId)
                         .orderByAsc(Dish::getCategoryId)
         );
-        // 附带规格组与选项，供编辑弹窗回显
-        dishSpecService.fillSpecs(dishes);
+        // 附带规格组与选项，供编辑弹窗回显；商家后台需要看到已停用规格
+        dishSpecService.fillSpecsForAdmin(dishes);
         return dishes;
     }
 
@@ -125,9 +125,6 @@ public class ShopAdminServiceImpl implements ShopAdminService {
         }
         int gsort = 0;
         for (DishSpecGroup g : specs) {
-            if (g.getStatus() != null && g.getStatus() == 0) {
-                continue;
-            }
             DishSpecGroup ng = new DishSpecGroup();
             ng.setDishId(dishId);
             ng.setName(g.getName());
@@ -136,23 +133,20 @@ public class ShopAdminServiceImpl implements ShopAdminService {
             ng.setMinSelect(g.getMinSelect() == null ? 1 : g.getMinSelect());
             ng.setMaxSelect(g.getMaxSelect() == null ? 1 : g.getMaxSelect());
             ng.setSortOrder(g.getSortOrder() == null ? gsort++ : g.getSortOrder());
-            ng.setStatus(1);
+            ng.setStatus(g.getStatus() == null ? 1 : g.getStatus());
             dishSpecGroupMapper.insert(ng);
             if (g.getOptions() == null) {
                 continue;
             }
             int osort = 0;
             for (DishSpecOption o : g.getOptions()) {
-                if (o.getStatus() != null && o.getStatus() == 0) {
-                    continue;
-                }
                 DishSpecOption no = new DishSpecOption();
                 no.setGroupId(ng.getId());
                 no.setDishId(o.getDishId());
                 no.setName(o.getName());
                 no.setPriceDelta(o.getPriceDelta() == null ? BigDecimal.ZERO : o.getPriceDelta());
                 no.setSortOrder(o.getSortOrder() == null ? osort++ : o.getSortOrder());
-                no.setStatus(1);
+                no.setStatus(o.getStatus() == null ? 1 : o.getStatus());
                 dishSpecOptionMapper.insert(no);
             }
         }

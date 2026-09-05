@@ -48,6 +48,11 @@
     .cate-card-name { font-size: 16px; font-weight: 600; color: #303133; }
     .cate-card-count { font-size: 12px; color: #909399; margin-top: 4px; }
     .cate-card-arrow { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: #c0c4cc; font-size: 18px; }
+    .cate-card.selected-clearance { border-color: #f56c6c; background: #fff7f7; }
+    .clearance-check { position: absolute; left: 14px; top: 14px; width: 22px; height: 22px; border: 2px solid #dcdfe6; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; background: #fff; font-size: 14px; }
+    .cate-card.selected-clearance .clearance-check { background: #f56c6c; border-color: #f56c6c; }
+    .clearance-summary { padding: 12px 14px; background: #fdf6ec; border: 1px solid #faecd8; color: #b88230; border-radius: 10px; margin-bottom: 16px; font-size: 13px; }
+    .clearance-section-title { font-size: 14px; font-weight: 600; color: #303133; margin-bottom: 12px; }
     .cate-breadcrumb { font-size: 15px; font-weight: 600; color: #303133; }
     .spec-config { border: 1px dashed #dcdfe6; border-radius: 8px; padding: 12px; margin-bottom: 12px; background: #fafbfc; }
     .spec-group-row, .spec-opt-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
@@ -92,6 +97,7 @@
           <div class="toolbar">
             <div>
               <el-button type="primary" @click="openDishDialog()">＋ 新增菜品</el-button>
+              <el-button type="warning" @click="enterDishClearance">估清下架</el-button>
               <el-button @click="loadDishes">刷新</el-button>
             </div>
           </div>
@@ -101,11 +107,78 @@
                 <div class="cate-card-icon">🍽️</div>
                 <div class="cate-card-name">{{c.name}}</div>
                 <div class="cate-card-count">{{cateDishCount(c.id)}} 个菜品</div>
+                <el-button v-if="c.status===0" size="small" type="success" style="margin-top:8px;" @click.stop="toggleCategoryStatus(c,true)">重新上架</el-button>
                 <div class="cate-card-arrow">›</div>
               </div>
               <div v-if="categories.length===0" class="text-muted" style="grid-column:1/-1;text-align:center;padding:40px 0;">暂无分类，请先到「分类管理」新增分类</div>
             </div>
           </el-card>
+        </div>
+        <!-- 估清下架 -->
+        <div v-else-if="dishView==='clearance'">
+          <div class="toolbar">
+            <div style="display:flex;gap:10px;align-items:center;">
+              <el-button @click="enterDishCates">← 返回分类</el-button>
+              <el-button-group>
+                <el-button size="small" :type="clearanceMode==='down'?'danger':''" @click="setClearanceMode('down')">估清下架</el-button>
+                <el-button size="small" :type="clearanceMode==='up'?'success':''" @click="setClearanceMode('up')">重新上架</el-button>
+              </el-button-group>
+              <el-select v-model="clearanceCategoryId" placeholder="全部分类" clearable size="small" style="width:150px">
+                <el-option v-for="c in categories" :key="c.id" :label="c.name" :value="c.id"></el-option>
+              </el-select>
+              <el-input v-model="clearanceKeyword" :placeholder="clearanceMode==='down'?'搜索菜品名称 / 描述':'搜索菜品名称 / 描述 / 分类'" clearable style="width:280px">
+                <template #prefix><span style="color:#909399;">🔍</span></template>
+              </el-input>
+            </div>
+            <el-button :type="clearanceMode==='down'?'danger':'success'" :disabled="clearanceSelectedIds.length===0 || clearanceRunning" :loading="clearanceRunning" @click="runClearance">
+              {{clearanceMode==='down'?'一键估清下架':'一键重新上架'}}（{{clearanceSelectedIds.length}} 道 / {{clearanceActionCount}} 项）
+            </el-button>
+          </div>
+          <el-card>
+            <div class="clearance-summary">
+              {{clearanceMode==='down'
+                ? '输入关键字，选择命中的菜品进行估清下架；系统会同时停用其他菜品规格配置中关联到这些菜品的规格项。'
+                : '输入菜品或分类关键字，选择菜品重新上架；系统会恢复菜品所属分类和关联的规格项。'}}
+            </div>
+            <el-table :data="clearanceMatchedDishes" border stripe>
+              <el-table-column label="选择" width="70" align="center">
+                <template #default="scope">
+                  <el-checkbox :model-value="clearanceSelectedIds.includes(scope.row.id)" @change="toggleClearanceDish(scope.row)"></el-checkbox>
+                </template>
+              </el-table-column>
+              <el-table-column prop="name" label="菜品名称" min-width="140"></el-table-column>
+              <el-table-column label="分类" min-width="120">
+                <template #default="scope">{{cateName(scope.row.categoryId)}}</template>
+              </el-table-column>
+              <el-table-column prop="price" label="价格(元)" width="100"></el-table-column>
+              <el-table-column label="状态" width="90">
+                <template #default="scope">
+                  <el-tag :type="scope.row.status===1?'success':'info'" size="small">{{scope.row.status===1?'上架':'下架'}}</el-tag>
+                </template>
+              </el-table-column>
+            </el-table>
+            <div v-if="clearanceMatchedDishes.length===0" class="text-muted" style="padding:30px;text-align:center;">没有匹配的菜品</div>
+          </el-card>
+          <el-card v-if="clearancePreviewRows.length>0" style="margin-top:16px;">
+            <div class="clearance-section-title">{{clearanceMode==='down'?'下架预览':'重新上架预览'}}</div>
+            <el-table :data="clearancePreviewRows" border stripe>
+              <el-table-column label="类型" width="120">
+                <template #default="scope">
+                  <el-tag :type="scope.row.type==='所选菜品' ? (clearanceMode==='down'?'danger':'success') : (clearanceMode==='down'?'warning':'success')" size="small">{{scope.row.type}}</el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column label="菜品名称" min-width="140">
+                <template #default="scope">{{scope.row.dish.name}}</template>
+              </el-table-column>
+              <el-table-column label="所属分类" min-width="120">
+                <template #default="scope">{{cateName(scope.row.dish.categoryId)}}</template>
+              </el-table-column>
+              <el-table-column label="关联说明" min-width="220">
+                <template #default="scope">{{scope.row.source}}</template>
+              </el-table-column>
+            </el-table>
+          </el-card>
+          <div v-else class="text-muted" style="padding:16px;">{{clearanceMode==='down'?'请先在上方选择菜品，再查看下架影响。':'请先在上方选择菜品，再查看需要恢复的内容。'}}</div>
         </div>
         <!-- 二级：分类菜品列表 -->
         <div v-else>
@@ -164,9 +237,9 @@
             <el-table-column prop="id" label="ID" width="70"></el-table-column>
             <el-table-column prop="name" label="分类名称" min-width="150"></el-table-column>
             <el-table-column prop="sortOrder" label="排序值" width="100"></el-table-column>
-            <el-table-column label="状态" width="100">
+            <el-table-column label="启用 / 停用" width="130">
               <template #default="scope">
-                <el-tag :type="scope.row.status==1?'success':'info'" size="small">{{scope.row.status==1?'启用':'停用'}}</el-tag>
+                <el-switch :model-value="scope.row.status==1" @change="(v)=>toggleCategoryStatus(scope.row,v)" active-text="启用" inactive-text="停用" inline-prompt></el-switch>
               </template>
             </el-table-column>
             <el-table-column label="操作" width="160">
@@ -343,11 +416,13 @@
               <el-input-number v-model="g.minSelect" :min="0" size="small" style="width:86px"></el-input-number>
               <span class="text-muted">~</span>
               <el-input-number v-model="g.maxSelect" :min="0" size="small" style="width:86px"></el-input-number>
+              <el-switch v-model="g.status" :active-value="1" :inactive-value="0" active-text="启用" inactive-text="停用" inline-prompt></el-switch>
               <el-button size="small" type="danger" @click="removeSpecGroup(g, gi)">删除组</el-button>
             </div>
             <div class="spec-opt-row" v-for="(o, oi) in g.options" :key="oi">
               <el-input v-model="o.name" placeholder="选项名（微辣/大碗/烧鸭）" style="width:170px"></el-input>
               <el-input-number v-model="o.priceDelta" :min="0" :precision="2" :step="1" size="small" style="width:100px" placeholder="加价"></el-input-number>
+              <el-switch v-model="o.status" :active-value="1" :inactive-value="0" active-text="启用" inactive-text="停用" inline-prompt></el-switch>
               <el-button size="small" type="danger" @click="removeSpecOption(g, oi)">删除</el-button>
             </div>
             <div class="spec-opt-row">
@@ -404,6 +479,6 @@
 <script src="/admin/vendor/zh-cn.min.js"></script>
 <script src="/admin/vendor/echarts.min.js"></script>
 <script src="/admin/js/api.js?v=20260904k"></script>
-<script src="/admin/js/app.js?v=20260904k"></script>
+<script src="/admin/js/app.js?v=20260905j"></script>
 </body>
 </html>
