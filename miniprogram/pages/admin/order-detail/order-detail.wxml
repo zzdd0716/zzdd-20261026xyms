@@ -1,0 +1,45 @@
+<wxs module="fmt">
+module.exports = function (n) {
+  var v = n * 1;
+  if (v !== v) return '0.00';
+  var neg = v < 0;
+  if (neg) v = -v;
+  var cents = Math.floor(v * 100 + 0.5);
+  var intPart = Math.floor(cents / 100);
+  var decPart = cents % 100;
+  var dec = decPart < 10 ? '0' + decPart : '' + decPart;
+  var r = intPart + '.' + dec;
+  return neg ? '-' + r : r;
+}
+</wxs>
+
+<view class="page" wx:if="{{order}}">
+  <!-- 主信息 -->
+  <view class="card">
+    <view class="head-row">
+      <text class="tag tag-new" style="font-size:26rpx;padding:6rpx 20rpx;">已下单</text>
+      <text class="head-amount">¥{{fmt(order.totalAmount)}}</text>
+    </view>
+    <view class="meta">单号：{{order.orderNo}}</view>
+    <view class="meta">桌号：{{tableNo}}</view>
+    <view class="meta">下单时间：{{order.createTime || ''}}</view>
+    <view class="meta" wx:if="{{order.remark}}">顾客备注：{{order.remark}}</view>
+  </view>
+
+  <!-- 明细 -->
+  <view class="card">
+    <view class="card-title">菜品明细（{{items.length}}）</view>
+    <view class="item-row" wx:for="{{items}}" wx:key="id">
+      <view class="item-main">
+        <text class="item-name">{{item.dishName}}</text>
+        <text class="item-spec" wx:if="{{item.specText}}">{{item.specText}}</text>
+        <text class="item-remark" wx:if="{{item.remark}}">〔{{item.remark}}〕</text>
+        <text class="item-qty">×{{item.quantity}}</text>
+      </view>
+      <view class="item-right">
+        <text class="item-price">¥{{fmt(item.price)}}</text>
+      </view>
+    </view>
+    <view wx:if="{{items.length === 0}}" class="empty">暂无明细</view>
+  </view>
+</view>

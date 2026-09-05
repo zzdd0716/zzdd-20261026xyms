@@ -1,0 +1,48 @@
+<view class="page">
+  <view class="toolbar">
+    <view class="btn-primary add-btn" bindtap="openAdd">＋ 新增分类</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="empty-tip"><text class="empty-icon">⏳</text>加载中…</view>
+
+  <block wx:elif="{{categories.length > 0}}">
+    <view class="cate-card card" wx:for="{{categories}}" wx:key="id">
+      <view class="cate-main">
+        <view class="cate-name">{{item.name}}</view>
+        <view class="cate-meta">排序 {{item.sortOrder}} · {{item.status === 1 ? '启用' : '停用'}}</view>
+      </view>
+      <view class="cate-actions">
+        <view class="mini-btn" data-id="{{item.id}}" data-status="{{item.status}}" bindtap="toggleRowStatus">
+          {{item.status === 1 ? '停用' : '启用'}}
+        </view>
+        <view class="mini-btn" data-item="{{item}}" bindtap="openEdit">编辑</view>
+        <view class="mini-btn danger" data-id="{{item.id}}" data-name="{{item.name}}" bindtap="remove">删除</view>
+      </view>
+    </view>
+  </block>
+
+  <view wx:else class="empty-tip"><text class="empty-icon">📂</text>暂无分类</view>
+
+  <!-- 新增/编辑弹窗 -->
+  <view class="modal-mask" wx:if="{{dialogVisible}}" bindtap="closeDialog">
+    <view class="dialog" catchtap="noop">
+      <view class="dialog-title">{{form.id ? '编辑分类' : '新增分类'}}</view>
+      <view class="form-row">
+        <text class="form-label">名称 *</text>
+        <input class="form-input" placeholder="如 招牌菜" value="{{form.name}}" bindinput="onNameInput" />
+      </view>
+      <view class="form-row">
+        <text class="form-label">排序</text>
+        <input class="form-input" type="number" placeholder="越小越靠前" value="{{form.sortOrder}}" bindinput="onSortInput" />
+      </view>
+      <view class="form-row">
+        <text class="form-label">启用</text>
+        <switch checked="{{form.status === 1}}" color="#ff6b2c" bindchange="toggleStatus" />
+      </view>
+      <view class="dialog-actions">
+        <view class="btn-ghost dlg-btn" bindtap="closeDialog">取消</view>
+        <view class="btn-primary dlg-btn" disabled="{{saving}}" bindtap="save">{{saving ? '保存中…' : '保存'}}</view>
+      </view>
+    </view>
+  </view>
+</view>

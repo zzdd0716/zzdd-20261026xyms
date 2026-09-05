@@ -1,0 +1,83 @@
+.page { min-height: 100vh; padding: 20rpx 24rpx 140rpx; }
+
+.section-title { font-size: 30rpx; font-weight: 700; color: #303133; margin-bottom: 20rpx; }
+.section-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20rpx; }
+.section-title-row .section-title { margin-bottom: 0; }
+.add-group-btn { line-height: 52rpx; height: 52rpx; font-size: 24rpx; padding: 0 24rpx; }
+
+.form-row { display: flex; align-items: center; padding: 18rpx 0; border-bottom: 2rpx solid #f6f7f9; }
+.form-row:last-child { border-bottom: none; }
+.form-label { width: 180rpx; font-size: 28rpx; color: #606266; flex-shrink: 0; }
+.form-input { flex: 1; font-size: 28rpx; height: 60rpx; line-height: 60rpx; }
+.picker-value { font-size: 28rpx; color: #303133; }
+
+/* 规格组 */
+.spec-group {
+  border: 2rpx dashed #dcdfe6;
+  border-radius: 14rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+  background: #fafbfc;
+}
+.spec-group-head { display: flex; align-items: center; justify-content: space-between; }
+.group-name-input {
+  flex: 1;
+  font-size: 28rpx;
+  font-weight: 600;
+  background: #fff;
+  border-radius: 10rpx;
+  padding: 0 16rpx;
+  height: 68rpx;
+  line-height: 68rpx;
+  margin-right: 20rpx;
+  box-sizing: border-box;
+}
+.group-remove { font-size: 24rpx; color: #e5484d; padding: 8rpx; }
+
+.spec-group-row {
+  display: flex;
+  align-items: center;
+  margin-top: 16rpx;
+}
+.spec-label { font-size: 26rpx; color: #606266; margin-right: 12rpx; }
+
+.spec-options { margin-top: 16rpx; }
+.spec-option-row { display: flex; align-items: center; margin-bottom: 12rpx; gap: 12rpx; }
+.opt-name-input {
+  flex: 1;
+  background: #fff;
+  border-radius: 10rpx;
+  font-size: 26rpx;
+  padding: 0 16rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  box-sizing: border-box;
+}
+.opt-price-input {
+  width: 150rpx;
+  background: #fff;
+  border-radius: 10rpx;
+  font-size: 26rpx;
+  padding: 0 16rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  text-align: right;
+  box-sizing: border-box;
+}
+.opt-remove { font-size: 26rpx; color: #b0b3ba; padding: 8rpx; }
+
+.add-option {
+  font-size: 26rpx;
+  color: #ff6b2c;
+  padding: 12rpx 0;
+}
+.spec-empty { font-size: 24rpx; color: #b0b3ba; line-height: 1.7; }
+
+.footer {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  padding: 16rpx 24rpx 24rpx;
+  background: #fff;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.05);
+}
+.save-btn { width: 100%; }

@@ -1,0 +1,95 @@
+﻿<wxs module="fmt">
+module.exports = function (n) {
+  var v = n * 1;
+  if (v !== v) return '0.00';
+  var neg = v < 0;
+  if (neg) v = -v;
+  var cents = Math.floor(v * 100 + 0.5);
+  var intPart = Math.floor(cents / 100);
+  var decPart = cents % 100;
+  var dec = decPart < 10 ? '0' + decPart : '' + decPart;
+  var r = intPart + '.' + dec;
+  return neg ? '-' + r : r;
+}
+</wxs>
+
+<view class="page">
+  <!-- 周期切换 -->
+  <view class="period-bar">
+    <view
+      class="period-item {{period === item.key ? 'active' : ''}}"
+      wx:for="{{periods}}"
+      wx:key="key"
+      data-key="{{item.key}}"
+      bindtap="switchPeriod">{{item.name}}</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="empty-tip"><text class="empty-icon">⏳</text>统计中…</view>
+
+  <block wx:elif="{{cashier}}">
+    <!-- 汇总卡片 -->
+    <view class="summary-grid">
+      <view class="summary-card card">
+        <view class="summary-label">总入账（元）</view>
+        <view class="summary-value">¥{{fmt(cashier.totalAmount)}}</view>
+      </view>
+      <view class="summary-card card">
+        <view class="summary-label">总单数</view>
+        <view class="summary-value">{{cashier.totalOrders || 0}}</view>
+      </view>
+    </view>
+
+    <!-- 各周期明细 -->
+    <view class="card" wx:if="{{cashier.rows.length > 0}}">
+      <view class="card-title">各周期入账明细</view>
+      <view class="row-line" wx:for="{{cashier.rows}}" wx:key="key">
+        <view class="row-label">{{item.label}}</view>
+        <view class="row-bar">
+          <view class="row-bar-inner" style="width:{{item.percent}}%;"></view>
+        </view>
+        <view class="row-value">¥{{item.amountText}}（{{item.count}}单）</view>
+      </view>
+    </view>
+    <view class="card" wx:else>
+      <view class="card-title">各周期入账明细</view>
+      <view class="no-data">当前周期暂无入账数据</view>
+    </view>
+
+    <!-- 销量占比饼图 -->
+    <view class="card">
+      <view class="card-title">菜品销量占比（{{periodName}}）</view>
+      <view wx:if="{{sales.length > 0}}">
+        <canvas type="2d" id="pieCanvas" class="pie-canvas"></canvas>
+        <view class="legend">
+          <view class="legend-row" wx:for="{{sales}}" wx:key="name">
+            <view class="legend-dot" style="background:{{legendColors[index % legendColors.length]}};"></view>
+            <text class="legend-name">{{item.name}}</text>
+            <text class="legend-num">{{item.quantity}} 份 · {{item.percent}}%</text>
+          </view>
+        </view>
+      </view>
+      <view wx:else class="no-data">当前周期暂无销量数据</view>
+    </view>
+
+    <!-- 销量排行 -->
+    <view class="card">
+      <view class="card-title">菜品销量排行（当前周期）</view>
+      <view wx:if="{{sales.length > 0}}">
+        <view class="sales-row" wx:for="{{sales}}" wx:key="name">
+          <view class="sales-rank">{{index + 1}}</view>
+          <view class="sales-main">
+            <view class="sales-head">
+              <text class="sales-name">{{item.name}}</text>
+              <text class="sales-num">{{item.quantity}} 份 · {{item.percent}}%</text>
+            </view>
+            <view class="sales-bar">
+              <view class="sales-bar-inner" style="width:{{item.width}}%;"></view>
+            </view>
+            <view class="sales-amt">销售额 ¥{{item.amountText}}</view>
+          </view>
+        </view>
+      </view>
+      <view wx:else class="no-data">当前周期暂无销量数据</view>
+    </view>
+  </block>
+</view>

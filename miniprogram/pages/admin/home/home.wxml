@@ -1,0 +1,36 @@
+<view class="page">
+  <view class="banner">
+    <view class="banner-title">🍜 点餐管理后台</view>
+    <view class="banner-sub">门店ID：{{shopId}} · 接口：{{baseUrl}}</view>
+  </view>
+
+  <view class="grid">
+    <view class="grid-item" data-page="/pages/admin/kitchen/kitchen" bindtap="go">
+      <view class="grid-icon">📋</view>
+      <view class="grid-name">接单工作台</view>
+      <view class="grid-desc">新单提醒 · 状态流转</view>
+    </view>
+    <view class="grid-item" data-page="/pages/admin/dishes/dishes" bindtap="go">
+      <view class="grid-icon">🍽️</view>
+      <view class="grid-name">菜品管理</view>
+      <view class="grid-desc">增删改 · 上下架 · 规格</view>
+    </view>
+    <view class="grid-item" data-page="/pages/admin/categories/categories" bindtap="go">
+      <view class="grid-icon">📂</view>
+      <view class="grid-name">分类管理</view>
+      <view class="grid-desc">分类增删改</view>
+    </view>
+    <view class="grid-item" data-page="/pages/admin/tables/tables" bindtap="go">
+      <view class="grid-icon">🪑</view>
+      <view class="grid-name">桌台管理</view>
+      <view class="grid-desc">桌码增删改</view>
+    </view>
+    <view class="grid-item" data-page="/pages/admin/stats/stats" bindtap="go">
+      <view class="grid-icon">💰</view>
+      <view class="grid-name">收银统计</view>
+      <view class="grid-desc">入账汇总 · 销量排行</view>
+    </view>
+  </view>
+
+  <view class="tip">提示：商家后台与顾客端共用一套后端接口；正式环境建议增加登录鉴权。</view>
+</view>

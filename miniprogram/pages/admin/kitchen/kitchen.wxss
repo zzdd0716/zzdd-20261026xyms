@@ -1,0 +1,50 @@
+.page { min-height: 100vh; padding: 20rpx 0 60rpx; }
+
+.filter-bar {
+  background: #fff;
+  white-space: nowrap;
+  padding: 16rpx 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  margin-bottom: 20rpx;
+}
+.filter-item {
+  display: inline-block;
+  padding: 12rpx 32rpx;
+  margin: 0 8rpx;
+  font-size: 28rpx;
+  color: #606266;
+  border-radius: 32rpx;
+  background: #f6f7f9;
+}
+.filter-item.active { background: #ff6b2c; color: #fff; font-weight: 600; }
+
+.order-card { margin: 0 24rpx 20rpx; }
+.order-head { display: flex; justify-content: space-between; align-items: center; }
+.order-head-left { display: flex; align-items: center; min-width: 0; }
+.order-no { font-size: 26rpx; color: #606266; }
+.order-table { font-size: 26rpx; color: #303133; font-weight: 600; flex-shrink: 0; }
+
+.order-items {
+  font-size: 24rpx;
+  color: #909399;
+  margin-top: 14rpx;
+  line-height: 1.6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.order-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 16rpx;
+}
+.order-time { font-size: 22rpx; color: #b0b3ba; margin-right: auto; }
+.order-amount { font-size: 32rpx; font-weight: 700; color: #303133; margin-right: 20rpx; }
+.advance-btn { flex-shrink: 0; line-height: 56rpx; height: 56rpx; font-size: 26rpx; padding: 0 30rpx; }
+
+/* 已下单标签 */
+.tag-new { background: #fff0e8; color: #ff6b2c; font-weight: 600; }

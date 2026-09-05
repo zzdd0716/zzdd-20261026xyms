@@ -1,0 +1,32 @@
+.page { min-height: 100vh; padding-bottom: 60rpx; }
+
+.hero {
+  background: linear-gradient(135deg, #ff6b2c, #ff9a5c);
+  padding: 56rpx 40rpx;
+  text-align: center;
+  color: #fff;
+}
+.avatar { font-size: 88rpx; margin-bottom: 12rpx; }
+.hero-name { font-size: 36rpx; font-weight: 700; }
+.hero-sub { font-size: 26rpx; opacity: 0.92; margin-top: 8rpx; }
+
+.info-card { margin: 24rpx 24rpx 0; }
+.info-row { display: flex; justify-content: space-between; padding: 16rpx 0; border-bottom: 2rpx solid #f6f7f9; }
+.info-row:last-child { border-bottom: none; }
+.info-label { font-size: 28rpx; color: #909399; }
+.info-value { font-size: 28rpx; color: #303133; font-weight: 500; }
+.info-value.small { font-size: 24rpx; color: #909399; }
+
+.menu-card { margin: 20rpx 24rpx 0; }
+.menu-row {
+  display: flex;
+  align-items: center;
+  padding: 28rpx 8rpx;
+  border-bottom: 2rpx solid #f6f7f9;
+}
+.menu-row:last-child { border-bottom: none; }
+.menu-icon { font-size: 36rpx; margin-right: 20rpx; }
+.menu-text { flex: 1; font-size: 30rpx; color: #303133; }
+.menu-arrow { font-size: 34rpx; color: #c0c4cc; }
+
+.page-tip { margin: 40rpx 40rpx 0; font-size: 22rpx; color: #b0b3ba; text-align: center; line-height: 1.7; }

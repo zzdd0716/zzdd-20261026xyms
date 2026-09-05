@@ -1,0 +1,9 @@
+.page { min-height: 100vh; padding: 20rpx 24rpx 60rpx; }
+
+.order-card { cursor: pointer; }
+.order-head { display: flex; justify-content: space-between; align-items: center; }
+.order-no { font-size: 26rpx; color: #606266; }
+.order-meta { font-size: 24rpx; color: #b0b3ba; margin-top: 12rpx; }
+.order-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 16rpx; }
+.order-view { font-size: 26rpx; color: #ff6b2c; }
+.order-amount { font-size: 32rpx; font-weight: 700; color: #303133; }

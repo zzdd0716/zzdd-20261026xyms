@@ -1,0 +1,119 @@
+/* app.wxss —— 全局样式 */
+page {
+  background: #f6f7f9;
+  font-size: 28rpx;
+  color: #303133;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+}
+
+view, text, input, textarea, button, image {
+  box-sizing: border-box;
+}
+
+/* 通用按钮 */
+.btn-primary {
+  background: #ff6b2c;
+  color: #fff;
+  border-radius: 44rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  border: none;
+  line-height: 88rpx;
+  height: 88rpx;
+  padding: 0 48rpx;
+}
+.btn-primary::after { border: none; }
+.btn-primary[disabled] { background: #ffb08a; color: #fff; }
+
+.btn-plain {
+  background: #fff;
+  color: #ff6b2c;
+  border: 2rpx solid #ff6b2c;
+  border-radius: 44rpx;
+  font-size: 28rpx;
+  line-height: 64rpx;
+  height: 64rpx;
+  padding: 0 36rpx;
+}
+.btn-plain::after { border: none; }
+
+.btn-ghost {
+  background: #fff;
+  color: #606266;
+  border: 2rpx solid #dcdfe6;
+  border-radius: 44rpx;
+  font-size: 28rpx;
+  line-height: 64rpx;
+  height: 64rpx;
+  padding: 0 36rpx;
+}
+.btn-ghost::after { border: none; }
+
+/* 卡片 */
+.card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+}
+
+/* 空态 */
+.empty-tip {
+  text-align: center;
+  color: #b0b3ba;
+  padding: 120rpx 0;
+  font-size: 28rpx;
+}
+.empty-tip .empty-icon { font-size: 72rpx; display: block; margin-bottom: 16rpx; }
+
+/* 标签 */
+.tag {
+  display: inline-block;
+  font-size: 22rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 8rpx;
+  line-height: 1.5;
+}
+.tag-success { background: #e8f7ee; color: #2ba471; }
+.tag-info { background: #eef3f8; color: #5a7ea8; }
+.tag-warn { background: #fdf3e7; color: #e6872c; }
+.tag-danger { background: #fdeeee; color: #e5484d; }
+.tag-muted { background: #f1f2f4; color: #909399; }
+.tag-new { background: #fff0e8; color: #ff6b2c; font-weight: 600; }
+
+/* 金额 */
+.money { color: #ff6b2c; font-weight: 700; }
+.money-symbol { font-size: 0.8em; }
+
+/* 价格行 */
+.price-row { display: flex; align-items: center; justify-content: space-between; }
+
+/* 步进器 */
+.stepper { display: flex; align-items: center; }
+.step-btn {
+  width: 52rpx; height: 52rpx;
+  border-radius: 50%;
+  border: 2rpx solid #ff6b2c;
+  background: #fff;
+  color: #ff6b2c;
+  font-size: 32rpx;
+  line-height: 48rpx;
+  text-align: center;
+  padding: 0;
+}
+.step-btn.minus { color: #8a8f99; border-color: #dcdfe6; }
+.step-btn.plus { background: #ff6b2c; color: #fff; border-color: #ff6b2c; }
+.step-btn.disabled { opacity: 0.4; }
+.step-btn::after { border: none; }
+.step-qty { min-width: 72rpx; text-align: center; font-size: 30rpx; font-weight: 600; }
+
+/* 弹层遮罩 */
+.modal-mask {
+  position: fixed;
+  left: 0; top: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

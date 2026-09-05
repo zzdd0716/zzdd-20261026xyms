@@ -1,0 +1,47 @@
+﻿<wxs module="fmt">
+module.exports = function (n) {
+  var v = n * 1;
+  if (v !== v) return '0.00';
+  var neg = v < 0;
+  if (neg) v = -v;
+  var cents = Math.floor(v * 100 + 0.5);
+  var intPart = Math.floor(cents / 100);
+  var decPart = cents % 100;
+  var dec = decPart < 10 ? '0' + decPart : '' + decPart;
+  var r = intPart + '.' + dec;
+  return neg ? '-' + r : r;
+}
+</wxs>
+
+<view class="page" wx:if="{{order}}">
+  <view class="card status-card">
+    <view class="status-row">
+      <text class="tag {{statusTag}}" style="font-size:28rpx;padding:8rpx 24rpx;">{{statusText}}</text>
+    </view>
+    <view class="meta">单号：{{order.orderNo}}</view>
+    <view class="meta">桌号：{{order.tableId || '-'}}</view>
+    <view class="meta">下单时间：{{order.createTime || ''}}</view>
+    <view wx:if="{{order.remark}}" class="meta">备注：{{order.remark}}</view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">菜品明细</view>
+    <view class="od-item" wx:for="{{items}}" wx:key="id">
+      <view class="od-item-main">
+        <text class="od-item-name">{{item.dishName}}</text>
+        <text class="od-item-spec" wx:if="{{item.specText}}">{{item.specText}}</text>
+        <text class="od-item-remark" wx:if="{{item.remark}}">〔{{item.remark}}〕</text>
+      </view>
+      <view class="od-item-right">
+        <text class="od-item-qty">×{{item.quantity}}</text>
+        <text class="od-item-amt">¥{{fmt(item.subtotal)}}</text>
+      </view>
+    </view>
+    <view wx:if="{{items.length === 0}}" class="od-empty">暂无明细</view>
+  </view>
+
+  <view class="card total-card">
+    <text>合计</text>
+    <text class="money">¥{{fmt(order.totalAmount)}}</text>
+  </view>
+</view>

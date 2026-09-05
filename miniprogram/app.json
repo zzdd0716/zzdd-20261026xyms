@@ -1,0 +1,62 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/menu/menu",
+    "pages/cart/cart",
+    "pages/orders/orders",
+    "pages/order-detail/order-detail",
+    "pages/profile/profile",
+    "pages/admin/home/home",
+    "pages/admin/kitchen/kitchen",
+    "pages/admin/order-detail/order-detail",
+    "pages/admin/dishes/dishes",
+    "pages/admin/clearance/clearance",
+    "pages/admin/dish-edit/dish-edit",
+    "pages/admin/categories/categories",
+    "pages/admin/tables/tables",
+    "pages/admin/stats/stats"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#ff6b2c",
+    "navigationBarTitleText": "扫码点餐",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f6f7f9",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#9a9ea6",
+    "selectedColor": "#ff6b2c",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/menu/menu",
+        "text": "点餐",
+        "iconPath": "images/tab/menu.png",
+        "selectedIconPath": "images/tab/menu-active.png"
+      },
+      {
+        "pagePath": "pages/cart/cart",
+        "text": "购物车",
+        "iconPath": "images/tab/cart.png",
+        "selectedIconPath": "images/tab/cart-active.png"
+      },
+      {
+        "pagePath": "pages/orders/orders",
+        "text": "订单",
+        "iconPath": "images/tab/orders.png",
+        "selectedIconPath": "images/tab/orders-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "images/tab/profile.png",
+        "selectedIconPath": "images/tab/profile-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

@@ -1,0 +1,105 @@
+.page { min-height: 100vh; padding: 20rpx 0 160rpx; }
+
+/* 模式切换 */
+.mode-bar {
+  display: flex;
+  background: #fff;
+  padding: 16rpx 24rpx;
+  margin-bottom: 16rpx;
+}
+.mode-item {
+  flex: 1;
+  text-align: center;
+  padding: 14rpx 0;
+  font-size: 30rpx;
+  color: #606266;
+  border-radius: 12rpx;
+}
+.mode-item.active {
+  background: #ff6b2c;
+  color: #fff;
+  font-weight: 700;
+}
+
+/* 搜索 */
+.search-bar { padding: 0 24rpx 16rpx; }
+.search-input {
+  background: #fff;
+  border-radius: 40rpx;
+  padding: 0 32rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+/* 分类 */
+.cate-bar {
+  white-space: nowrap;
+  padding: 0 24rpx 16rpx;
+}
+.cate-item {
+  display: inline-block;
+  padding: 10rpx 28rpx;
+  margin-right: 12rpx;
+  font-size: 26rpx;
+  color: #606266;
+  border-radius: 30rpx;
+  background: #fff;
+}
+.cate-item.active { background: #ff6b2c; color: #fff; font-weight: 600; }
+
+/* 命中菜品 */
+.section { margin: 0 24rpx 20rpx; }
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+.section-title { font-size: 30rpx; font-weight: 700; color: #303133; }
+.section-tip { font-size: 22rpx; color: #b0b3ba; }
+
+.dish-row {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 2rpx solid #f6f7f9;
+}
+.dish-row:last-child { border-bottom: none; }
+.dish-row.checked { background: #fff8f4; margin: 0 -16rpx; padding: 20rpx 16rpx; border-radius: 12rpx; }
+
+.check-box {
+  width: 40rpx; height: 40rpx;
+  border: 3rpx solid #dcdfe6;
+  border-radius: 10rpx;
+  margin-right: 20rpx;
+  text-align: center;
+  line-height: 36rpx;
+  color: #fff;
+  font-size: 26rpx;
+  flex-shrink: 0;
+  background: #fff;
+}
+.dish-row.checked .check-box { background: #ff6b2c; border-color: #ff6b2c; }
+
+.dish-main { flex: 1; min-width: 0; }
+.dish-name { font-size: 30rpx; font-weight: 600; color: #303133; }
+.dish-cate { font-size: 22rpx; color: #b0b3ba; margin-left: 12rpx; }
+
+/* 关联规格项 */
+.change-dish { margin-bottom: 12rpx; }
+.change-dish-name { font-size: 28rpx; font-weight: 600; color: #303133; margin-bottom: 6rpx; }
+.change-item { font-size: 24rpx; color: #e6872c; line-height: 1.8; padding-left: 16rpx; }
+.change-arrow { margin-right: 6rpx; color: #b0b3ba; }
+
+/* 底部执行 */
+.footer {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  padding: 16rpx 24rpx 24rpx;
+  background: #fff;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.05);
+}
+.run-btn { width: 100%; text-align: center; }
+.run-btn[disabled] { background: #f1b9a0; }

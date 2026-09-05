@@ -1,0 +1,30 @@
+<view class="page">
+  <view class="hero">
+    <view class="avatar">👤</view>
+    <view class="hero-name">微信用户</view>
+    <view class="hero-sub" wx:if="{{tableNo}}">桌号 {{tableNo}}</view>
+    <view class="hero-sub" wx:else>未选择桌台</view>
+  </view>
+
+  <view class="card info-card">
+    <view class="info-row"><text class="info-label">门店ID</text><text class="info-value">{{shopId}}</text></view>
+    <view class="info-row"><text class="info-label">用户ID</text><text class="info-value">{{userId || '未登录'}}</text></view>
+    <view class="info-row"><text class="info-label">标识尾号</text><text class="info-value">{{openidTail || '-'}}</text></view>
+    <view class="info-row"><text class="info-label">接口地址</text><text class="info-value small">{{baseUrl}}</text></view>
+  </view>
+
+  <view class="card menu-card">
+    <view class="menu-row" bindtap="changeTable">
+      <text class="menu-icon">🪑</text>
+      <text class="menu-text">切换桌台</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-row" bindtap="goAdmin">
+      <text class="menu-icon">⚙️</text>
+      <text class="menu-text">商家管理后台</text>
+      <text class="menu-arrow">›</text>
+    </view>
+  </view>
+
+  <view class="page-tip">顾客端仅展示点餐相关功能；商家后台包含接单、菜品、分类、桌台与收银统计。</view>
+</view>

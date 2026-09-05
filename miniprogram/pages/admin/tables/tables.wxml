@@ -1,0 +1,45 @@
+<view class="page">
+  <view class="toolbar">
+    <view class="btn-primary add-btn" bindtap="openAdd">＋ 新增桌台</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="empty-tip"><text class="empty-icon">⏳</text>加载中…</view>
+
+  <block wx:elif="{{tables.length > 0}}">
+    <view class="table-card card" wx:for="{{tables}}" wx:key="id">
+      <view class="table-main">
+        <view class="table-no">🪑 {{item.tableNo}}</view>
+        <view class="table-meta">{{item.seatCount}} 人 · 桌码 {{item.qrCode}} · {{item.status === 1 ? '空闲' : (item.status === 2 ? '用餐中' : '停用')}}</view>
+      </view>
+      <view class="table-actions">
+        <view class="mini-btn" data-item="{{item}}" bindtap="openEdit">编辑</view>
+        <view class="mini-btn danger" data-id="{{item.id}}" data-no="{{item.tableNo}}" bindtap="remove">删除</view>
+      </view>
+    </view>
+  </block>
+
+  <view wx:else class="empty-tip"><text class="empty-icon">🪑</text>暂无桌台</view>
+
+  <!-- 弹窗 -->
+  <view class="modal-mask" wx:if="{{dialogVisible}}" bindtap="closeDialog">
+    <view class="dialog" catchtap="noop">
+      <view class="dialog-title">{{form.id ? '编辑桌台' : '新增桌台'}}</view>
+      <view class="form-row">
+        <text class="form-label">桌号 *</text>
+        <input class="form-input" placeholder="如 A01 / 2-3" value="{{form.tableNo}}" bindinput="onTableNoInput" />
+      </view>
+      <view class="form-row">
+        <text class="form-label">座位数</text>
+        <input class="form-input" type="number" placeholder="默认 4" value="{{form.seatCount}}" bindinput="onSeatInput" />
+      </view>
+      <view class="form-row">
+        <text class="form-label">状态</text>
+        <switch checked="{{form.status === 1}}" color="#ff6b2c" bindchange="toggleStatus" />
+      </view>
+      <view class="dialog-actions">
+        <view class="btn-ghost dlg-btn" bindtap="closeDialog">取消</view>
+        <view class="btn-primary dlg-btn" disabled="{{saving}}" bindtap="save">{{saving ? '保存中…' : '保存'}}</view>
+      </view>
+    </view>
+  </view>
+</view>

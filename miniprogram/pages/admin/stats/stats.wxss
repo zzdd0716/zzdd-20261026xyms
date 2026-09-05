@@ -1,0 +1,66 @@
+.page { min-height: 100vh; padding: 20rpx 0 60rpx; }
+
+.period-bar {
+  background: #fff;
+  display: flex;
+  padding: 16rpx 24rpx;
+  margin-bottom: 20rpx;
+}
+.period-item {
+  flex: 1;
+  text-align: center;
+  padding: 12rpx 0;
+  font-size: 28rpx;
+  color: #606266;
+  border-radius: 32rpx;
+}
+.period-item.active { background: #ff6b2c; color: #fff; font-weight: 600; }
+
+.summary-grid { display: flex; gap: 20rpx; padding: 0 24rpx; }
+.summary-card { flex: 1; text-align: center; }
+.summary-label { font-size: 24rpx; color: #909399; }
+.summary-value { font-size: 40rpx; font-weight: 700; color: #303133; margin-top: 10rpx; }
+.summary-value:first-of-type { color: #ff6b2c; }
+
+.card { margin: 20rpx 24rpx 0; }
+.card-title { font-size: 30rpx; font-weight: 700; color: #303133; margin-bottom: 20rpx; }
+
+.row-line { display: flex; align-items: center; margin-bottom: 18rpx; }
+.row-label { width: 200rpx; font-size: 24rpx; color: #606266; flex-shrink: 0; }
+.row-bar { flex: 1; height: 14rpx; background: #f1f2f4; border-radius: 8rpx; overflow: hidden; margin: 0 16rpx; }
+.row-bar-inner { height: 100%; background: linear-gradient(90deg, #ff9a5c, #ff6b2c); border-radius: 8rpx; }
+.row-value { font-size: 22rpx; color: #909399; flex-shrink: 0; }
+
+.no-data { text-align: center; color: #b0b3ba; font-size: 26rpx; padding: 40rpx 0; }
+
+/* 销量饼图 */
+.pie-canvas { width: 100%; height: 420rpx; }
+.legend { margin-top: 16rpx; }
+.legend-row { display: flex; align-items: center; padding: 10rpx 0; }
+.legend-dot { width: 20rpx; height: 20rpx; border-radius: 50%; margin-right: 16rpx; flex-shrink: 0; }
+.legend-name { flex: 1; font-size: 26rpx; color: #303133; }
+.legend-num { font-size: 24rpx; color: #909399; }
+
+.sales-row { display: flex; margin-bottom: 24rpx; }
+.sales-rank {
+  width: 44rpx; height: 44rpx;
+  border-radius: 50%;
+  background: #f1f2f4;
+  color: #909399;
+  font-size: 24rpx;
+  text-align: center;
+  line-height: 44rpx;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+.sales-row:first-child .sales-rank { background: #ff6b2c; color: #fff; }
+.sales-row:nth-child(2) .sales-rank { background: #ff9a5c; color: #fff; }
+.sales-row:nth-child(3) .sales-rank { background: #ffc069; color: #fff; }
+
+.sales-main { flex: 1; min-width: 0; }
+.sales-head { display: flex; justify-content: space-between; align-items: center; }
+.sales-name { font-size: 28rpx; font-weight: 600; color: #303133; }
+.sales-num { font-size: 22rpx; color: #909399; }
+.sales-bar { height: 16rpx; background: #f1f2f4; border-radius: 8rpx; overflow: hidden; margin: 10rpx 0 6rpx; }
+.sales-bar-inner { height: 100%; background: linear-gradient(90deg, #ffb347, #ff6b2c); border-radius: 8rpx; }
+.sales-amt { font-size: 22rpx; color: #b0b3ba; }

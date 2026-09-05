@@ -1,0 +1,42 @@
+<wxs module="fmt">
+module.exports = function (n) {
+  var v = n * 1;
+  if (v !== v) return '0.00';
+  var neg = v < 0;
+  if (neg) v = -v;
+  var cents = Math.floor(v * 100 + 0.5);
+  var intPart = Math.floor(cents / 100);
+  var decPart = cents % 100;
+  var dec = decPart < 10 ? '0' + decPart : '' + decPart;
+  var r = intPart + '.' + dec;
+  return neg ? '-' + r : r;
+}
+</wxs>
+
+<view class="page">
+  <view wx:if="{{loading}}" class="empty-tip"><text class="empty-icon">⏳</text>加载中…</view>
+
+  <block wx:elif="{{orders.length > 0}}">
+    <view class="order-card card" wx:for="{{orders}}" wx:key="id">
+      <view class="order-head" data-id="{{item.id}}" bindtap="goDetail">
+        <view class="order-head-left">
+          <text class="order-no">单号 {{item.orderNo}}</text>
+          <text class="tag tag-new" style="margin-left:12rpx;">已下单</text>
+        </view>
+        <text class="order-table">🪑 {{item.tableNo}}</text>
+      </view>
+      <view class="order-items" data-id="{{item.id}}" bindtap="goDetail" wx:if="{{item.itemsPreview}}">
+        {{item.itemsPreview}}
+      </view>
+      <view class="order-foot">
+        <text class="order-time">{{item.createTime || ''}}</text>
+        <text class="order-amount">¥{{fmt(item.totalAmount)}}</text>
+      </view>
+    </view>
+  </block>
+
+  <view wx:else class="empty-tip">
+    <text class="empty-icon">📋</text>
+    暂无订单
+  </view>
+</view>

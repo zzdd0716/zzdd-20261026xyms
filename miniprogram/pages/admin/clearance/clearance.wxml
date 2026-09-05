@@ -1,0 +1,76 @@
+<view class="page">
+  <!-- 模式切换 -->
+  <view class="mode-bar">
+    <view class="mode-item {{mode === 'down' ? 'active' : ''}}" data-mode="down" bindtap="switchMode">估清下架</view>
+    <view class="mode-item {{mode === 'up' ? 'active' : ''}}" data-mode="up" bindtap="switchMode">重新上架</view>
+  </view>
+
+  <!-- 搜索 -->
+  <view class="search-bar">
+    <input
+      class="search-input"
+      placeholder="{{mode === 'down' ? '搜索要下架的菜品（如输入「鸡」）' : '搜索已下架菜品或分类'}}"
+      value="{{keyword}}"
+      bindinput="onKeywordInput" />
+  </view>
+
+  <!-- 分类筛选 -->
+  <scroll-view scroll-x class="cate-bar" wx:if="{{categories.length > 0}}">
+    <view class="cate-item {{categoryId === null ? 'active' : ''}}" data-id="{{null}}" bindtap="switchCate">全部分类</view>
+    <view
+      class="cate-item {{categoryId === item.id ? 'active' : ''}}"
+      wx:for="{{categories}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="switchCate">{{item.name}}</view>
+  </scroll-view>
+
+  <!-- 命中菜品（可勾选） -->
+  <view class="card section">
+    <view class="section-head">
+      <text class="section-title">{{mode === 'down' ? '上架中的菜品' : '已下架的菜品'}}（{{matchedList.length}}）</text>
+      <text class="section-tip">勾选后可一键处理</text>
+    </view>
+
+    <view wx:if="{{loading}}" class="empty-tip"><text class="empty-icon">⏳</text>加载中…</view>
+
+    <block wx:elif="{{matchedList.length > 0}}">
+      <view
+        class="dish-row {{item.selected ? 'checked' : ''}}"
+        wx:for="{{matchedList}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="toggleDish">
+        <view class="check-box">{{item.selected ? '✓' : ''}}</view>
+        <view class="dish-main">
+          <text class="dish-name">{{item.name}}</text>
+          <text class="dish-cate">{{item.cateName}}</text>
+        </view>
+        <text class="tag {{item.status === 1 ? 'tag-success' : 'tag-muted'}}">{{item.status === 1 ? '上架中' : '已下架'}}</text>
+      </view>
+    </block>
+    <view wx:else class="empty-tip"><text class="empty-icon">🔍</text>没有匹配的菜品</view>
+  </view>
+
+  <!-- 关联规格项影响 -->
+  <view class="card section" wx:if="{{relatedList.length > 0}}">
+    <view class="section-head">
+      <text class="section-title">关联规格项（{{specCountNum}}）</text>
+      <text class="section-tip">{{mode === 'down' ? '将自动停用' : '将自动恢复'}}</text>
+    </view>
+    <view class="change-dish" wx:for="{{relatedList}}" wx:key="index" wx:for-item="ch">
+      <view class="change-dish-name">{{ch.dish.name}}</view>
+      <view class="change-item" wx:for="{{ch.matches}}" wx:key="index" wx:for-item="m">
+        <text class="change-arrow">↳</text>
+        {{mode === 'down' ? '将停用' : '将恢复'}}规格「{{m.group.name}}」中的「{{m.option.name}}」
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部一键执行 -->
+  <view class="footer">
+    <view class="btn-primary run-btn" disabled="{{running || actionCountNum === 0}}" bindtap="run">
+      {{running ? '处理中…' : (mode === 'down' ? '一键下架' : '一键上架') + '（' + actionCountNum + ' 项）'}}
+    </view>
+  </view>
+</view>

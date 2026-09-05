@@ -1,0 +1,117 @@
+<wxs module="fmt">
+module.exports = function (n) {
+  var v = n * 1;
+  if (v !== v) return '0.00';
+  var neg = v < 0;
+  if (neg) v = -v;
+  var cents = Math.floor(v * 100 + 0.5);
+  var intPart = Math.floor(cents / 100);
+  var decPart = cents % 100;
+  var dec = decPart < 10 ? '0' + decPart : '' + decPart;
+  var r = intPart + '.' + dec;
+  return neg ? '-' + r : r;
+}
+</wxs>
+
+<view class="page">
+  <!-- 顶部门店信息 -->
+  <view class="header">
+    <view class="header-shop">
+      <view class="shop-name">🍜 扫码点餐</view>
+      <view class="shop-meta" wx:if="{{tableNo}}">桌号：{{tableNo}} · 选好菜加入购物车</view>
+    </view>
+  </view>
+
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <view class="search-box">
+      <text class="search-icon">🔍</text>
+      <input
+        class="search-input"
+        placeholder="搜索菜品名称"
+        value="{{keyword}}"
+        bindinput="onKeywordInput" />
+      <view class="search-clear" wx:if="{{keyword}}" bindtap="clearKeyword">✕</view>
+    </view>
+  </view>
+
+  <!-- 分类 + 菜品 左右两栏 -->
+  <view class="content">
+    <!-- 左侧竖向分类导航 -->
+    <scroll-view scroll-y class="cate-bar" wx:if="{{categories.length > 0}}">
+      <view
+        class="cate-item {{activeCate === item.id ? 'active' : ''}}"
+        wx:for="{{categories}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="switchCate">{{item.name}}</view>
+    </scroll-view>
+
+    <!-- 右侧菜品列表 -->
+    <scroll-view scroll-y class="dish-list">
+      <view wx:if="{{loading}}" class="empty-tip"><text class="empty-icon">⏳</text>菜单加载中…</view>
+      <block wx:elif="{{filteredList.length > 0}}">
+        <view class="dish-card" wx:for="{{filteredList}}" wx:key="id">
+          <view class="dish-img">
+            <image wx:if="{{item.image}}" src="{{item.image}}" mode="aspectFill" class="dish-img-pic" />
+            <view wx:else class="dish-img-empty">🍛</view>
+          </view>
+          <view class="dish-info">
+            <view class="dish-name">{{item.name}}</view>
+            <view class="dish-desc" wx:if="{{item.description}}">{{item.description}}</view>
+            <view class="dish-sold" wx:if="{{item.soldCount > 0}}">已售 {{item.soldCount}}</view>
+            <view class="dish-price-row">
+              <view class="dish-price">¥<text class="price-int">{{fmt(item.price)}}</text></view>
+              <view class="dish-add-area">
+                <text class="dish-picked" wx:if="{{cartQtyMap[item.id] > 0}}">已选 {{cartQtyMap[item.id]}} 份</text>
+                <view class="spec-open-btn" data-id="{{item.id}}" bindtap="openSpec">选规格</view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </block>
+      <view wx:else class="empty-tip"><text class="empty-icon">🍽️</text>该分类暂无菜品</view>
+    </scroll-view>
+  </view>
+
+  <!-- 悬浮购物车挂件（常显，空车时置灰） -->
+  <view class="cart-fab {{cartCount > 0 ? '' : 'cart-empty'}}" bindtap="goCart">
+    <view class="cart-fab-icon">🛒<text class="cart-fab-badge" wx:if="{{cartCount > 0}}">{{cartCount}}</text></view>
+  </view>
+
+  <!-- 购物车明细弹窗 -->
+  <view class="cart-popup-mask" wx:if="{{cartPopupVisible}}" bindtap="closeCartPopup">
+    <view class="cart-popup" catchtap="noop">
+      <view class="cart-popup-head">
+        <text class="cart-popup-title">已选菜品</text>
+        <text class="cart-popup-clear" bindtap="clearCart">清空</text>
+      </view>
+      <scroll-view scroll-y class="cart-popup-list">
+        <view class="cart-popup-item" wx:for="{{cartList}}" wx:key="index" wx:for-item="item">
+          <view class="cart-item-info">
+            <view class="cart-item-name">{{item.name}}</view>
+            <view class="cart-item-spec" wx:if="{{item.specText}}">{{item.specText}}</view>
+            <view class="cart-item-remark" wx:if="{{item.remark}}">备注：{{item.remark}}</view>
+            <view class="cart-item-price">¥{{fmt(item.price)}}</view>
+          </view>
+          <view class="cart-item-stepper">
+            <view class="step-btn minus" data-key="{{item.key}}" bindtap="cartItemDec">−</view>
+            <view class="step-qty">{{item.qty}}</view>
+            <view class="step-btn plus" data-key="{{item.key}}" bindtap="cartItemInc">＋</view>
+          </view>
+        </view>
+      </scroll-view>
+      <view class="cart-popup-foot">
+        <view class="cart-popup-total">合计 <text class="money">¥{{fmt(cartTotal)}}</text></view>
+        <view class="cart-popup-checkout" bindtap="goCheckout">去结算</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 选规格弹窗 -->
+  <spec-dialog
+    dish="{{specDish}}"
+    visible="{{specVisible}}"
+    bind:confirm="onSpecConfirm"
+    bind:close="onSpecClose" />
+</view>

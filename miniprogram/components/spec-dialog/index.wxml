@@ -1,0 +1,59 @@
+<wxs module="fmt">
+module.exports = function (n) {
+  var v = n * 1;
+  if (v !== v) return '0.00';
+  var neg = v < 0;
+  if (neg) v = -v;
+  var cents = Math.floor(v * 100 + 0.5);
+  var intPart = Math.floor(cents / 100);
+  var decPart = cents % 100;
+  var dec = decPart < 10 ? '0' + decPart : '' + decPart;
+  var r = intPart + '.' + dec;
+  return neg ? '-' + r : r;
+}
+</wxs>
+<view class="modal-mask" wx:if="{{visible}}" bindtap="onMaskTap">
+  <view class="spec-modal" catchtap="noop">
+    <view class="spec-head">
+      <view class="spec-title">{{dish.name}}</view>
+      <view class="spec-price">¥{{fmt(unitPrice)}}</view>
+    </view>
+
+    <scroll-view scroll-y class="spec-body">
+      <view class="spec-group" wx:for="{{viewSpecs}}" wx:key="id" wx:for-item="g">
+        <view class="spec-group-head">
+          <text class="spec-group-name">{{g.name}}</text>
+          <text class="spec-group-rule required" wx:if="{{g.required === 1 && g.type !== 3}}">必选</text>
+          <text class="spec-group-rule" wx:else>可选</text>
+        </view>
+        <view class="spec-options">
+          <view
+            class="spec-option {{o.selected ? 'active' : ''}}"
+            wx:for="{{g.options}}"
+            wx:key="id"
+            wx:for-item="o"
+            data-gid="{{g.id}}"
+            data-oid="{{o.id}}"
+            bindtap="toggleOpt">
+            <text class="opt-name">{{o.name}}</text>
+            <text class="opt-delta" wx:if="{{o.priceDelta > 0}}">+¥{{fmt(o.priceDelta)}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="spec-remark-row">
+        <input class="spec-remark-input" placeholder="口味备注" value="{{remark}}" bindinput="onRemarkInput" />
+      </view>
+    </scroll-view>
+
+    <view class="spec-foot">
+      <view class="stepper">
+        <view class="step-btn minus {{qty <= 1 ? 'disabled' : ''}}" bindtap="qtyDec">−</view>
+        <view class="step-qty">{{qty}}</view>
+        <view class="step-btn plus" bindtap="qtyInc">＋</view>
+      </view>
+      <view class="spec-total">合计 <text class="money">¥{{fmt(totalPrice)}}</text></view>
+      <view class="btn-primary spec-confirm" bindtap="confirm">加入购物车</view>
+    </view>
+  </view>
+</view>

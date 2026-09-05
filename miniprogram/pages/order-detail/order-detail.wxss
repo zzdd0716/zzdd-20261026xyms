@@ -1,0 +1,21 @@
+.page { min-height: 100vh; padding: 20rpx 24rpx 60rpx; }
+
+.status-card { text-align: center; }
+.status-row { margin-bottom: 16rpx; }
+.meta { font-size: 26rpx; color: #606266; line-height: 1.9; }
+
+.card-title { font-size: 30rpx; font-weight: 700; color: #303133; margin-bottom: 16rpx; }
+
+.od-item { display: flex; justify-content: space-between; padding: 14rpx 0; border-bottom: 2rpx solid #f6f7f9; }
+.od-item:last-child { border-bottom: none; }
+.od-item-main { flex: 1; min-width: 0; margin-right: 20rpx; display: flex; flex-direction: column; }
+.od-item-name { font-size: 28rpx; font-weight: 600; color: #303133; }
+.od-item-spec { font-size: 24rpx; color: #909399; margin-top: 4rpx; }
+.od-item-remark { font-size: 24rpx; color: #e6a23c; margin-top: 4rpx; }
+.od-item-right { display: flex; align-items: center; }
+.od-item-qty { font-size: 26rpx; color: #606266; margin-right: 20rpx; }
+.od-item-amt { font-size: 28rpx; color: #303133; font-weight: 600; }
+.od-empty { text-align: center; color: #b0b3ba; padding: 40rpx 0; font-size: 26rpx; }
+
+.total-card { display: flex; justify-content: space-between; align-items: center; font-size: 30rpx; font-weight: 600; }
+.total-card .money { font-size: 40rpx; }

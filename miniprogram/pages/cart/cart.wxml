@@ -1,0 +1,62 @@
+﻿<wxs module="fmt">
+module.exports = function (n) {
+  var v = n * 1;
+  if (v !== v) return '0.00';
+  var neg = v < 0;
+  if (neg) v = -v;
+  var cents = Math.floor(v * 100 + 0.5);
+  var intPart = Math.floor(cents / 100);
+  var decPart = cents % 100;
+  var dec = decPart < 10 ? '0' + decPart : '' + decPart;
+  var r = intPart + '.' + dec;
+  return neg ? '-' + r : r;
+}
+</wxs>
+
+<view class="page">
+  <view class="shop-bar" wx:if="{{tableNo}}">
+    桌号 {{tableNo}} · 共 {{count}} 件
+  </view>
+
+  <block wx:if="{{items.length > 0}}">
+    <view class="cart-list">
+      <view class="cart-item card" wx:for="{{items}}" wx:key="key">
+        <view class="cart-item-main">
+          <view class="cart-item-name">{{item.name}}</view>
+          <view class="cart-item-spec" wx:if="{{item.specText}}">{{item.specText}}</view>
+          <input
+            class="cart-item-remark"
+            placeholder="口味备注（选填）"
+            value="{{item.remark}}"
+            data-key="{{item.key}}"
+            bindinput="onRemarkInput" />
+        </view>
+        <view class="cart-item-right">
+          <view class="cart-item-price">¥{{fmt(item.price)}}</view>
+          <view class="stepper">
+            <view class="step-btn minus" data-key="{{item.key}}" bindtap="dec">−</view>
+            <view class="step-qty">{{item.qty}}</view>
+            <view class="step-btn plus" data-key="{{item.key}}" bindtap="inc">＋</view>
+          </view>
+          <view class="cart-item-remove" data-key="{{item.key}}" bindtap="remove">移除</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="cart-summary card">
+      <view class="summary-row">
+        <text>共 {{count}} 件</text>
+        <text>合计 <text class="money">¥{{fmt(total)}}</text></text>
+      </view>
+      <button class="btn-primary submit-btn" disabled="{{submitting}}" bindtap="submit">
+        {{submitting ? '提交中…' : '确认下单'}}
+      </button>
+    </view>
+  </block>
+
+  <view wx:else class="empty-tip">
+    <text class="empty-icon">🛒</text>
+    购物车是空的，去点餐吧~
+    <view class="btn-plain go-menu" bindtap="goMenu">去点餐</view>
+  </view>
+</view>

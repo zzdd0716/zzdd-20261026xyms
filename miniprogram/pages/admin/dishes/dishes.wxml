@@ -1,0 +1,78 @@
+<wxs module="fmt">
+module.exports = function (n) {
+  var v = n * 1;
+  if (v !== v) return '0.00';
+  var neg = v < 0;
+  if (neg) v = -v;
+  var cents = Math.floor(v * 100 + 0.5);
+  var intPart = Math.floor(cents / 100);
+  var decPart = cents % 100;
+  var dec = decPart < 10 ? '0' + decPart : '' + decPart;
+  var r = intPart + '.' + dec;
+  return neg ? '-' + r : r;
+}
+</wxs>
+
+<view class="page">
+  <view class="top-bar">
+    <scroll-view scroll-x class="filter-bar">
+      <view
+        class="filter-item {{activeCate === null ? 'active' : ''}}"
+        data-id="{{null}}"
+        bindtap="switchCate">全部</view>
+      <view
+        class="filter-item {{activeCate === item.id ? 'active' : ''}}"
+        wx:for="{{categories}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="switchCate">{{item.name}}</view>
+    </scroll-view>
+
+    <view class="search-row">
+      <input
+        class="search-input"
+        placeholder="搜索菜品名称或描述"
+        value="{{keyword}}"
+        bindinput="onKeywordInput" />
+      <view class="sort-btn {{priceSort !== '' ? 'active' : ''}}" bindtap="togglePriceSort">{{priceSortText}}</view>
+    </view>
+
+    <view class="top-actions">
+      <view class="btn-plain clearance-btn" bindtap="goClearance">估清下架</view>
+      <view class="btn-primary add-btn" bindtap="addDish">＋ 新增菜品</view>
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="empty-tip"><text class="empty-icon">⏳</text>加载中…</view>
+
+  <block wx:elif="{{filteredList.length > 0}}">
+    <view class="dish-card card" wx:for="{{filteredList}}" wx:key="id">
+      <view class="dish-img">
+        <image wx:if="{{item.image}}" src="{{item.image}}" mode="aspectFill" class="dish-img-pic" />
+        <view wx:else class="dish-img-empty">🍛</view>
+      </view>
+      <view class="dish-info">
+        <view class="dish-name-row">
+          <text class="dish-name">{{item.name}}</text>
+          <text class="tag {{item.status === 1 ? 'tag-success' : 'tag-muted'}}">{{item.status === 1 ? '上架' : '下架'}}</text>
+        </view>
+        <view class="dish-meta">{{item.cateName}} · 已售 {{item.soldCount || 0}}</view>
+        <view class="dish-price-row">
+          <text class="dish-price">¥{{fmt(item.price)}}</text>
+          <view class="dish-actions">
+            <view class="mini-btn" data-id="{{item.id}}" data-status="{{item.status}}" bindtap="toggleStatus">
+              {{item.status === 1 ? '下架' : '上架'}}
+            </view>
+            <view class="mini-btn" data-id="{{item.id}}" bindtap="editDish">编辑</view>
+            <view class="mini-btn danger" data-id="{{item.id}}" data-name="{{item.name}}" bindtap="deleteDish">删除</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <view wx:else class="empty-tip">
+    <text class="empty-icon">🍽️</text>
+    该分类暂无菜品
+  </view>
+</view>
