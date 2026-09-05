@@ -159,8 +159,13 @@ const App = {
       const named = selectedNames.some(n => {
         if (!n) return false;
         const nl = n.toLowerCase();
-        // 双向匹配：选项名包含菜品名（如选项"白切鸡饭"）或菜品名包含选项名（如菜品"白切鸡饭"匹配选项"白切鸡"）
-        return optName.includes(nl) || nl.includes(optName);
+        // 方向1：选项名包含菜品名（如选项"白切鸡饭"匹配菜品"白切鸡"）
+        if (optName.includes(nl)) return true;
+        // 方向2：菜品名包含选项名时，要求选项名是菜品名去后缀后的核心名称的后缀
+        // 避免"烧鹅腿饭"误匹配"烧鹅"选项；但"白切鸡饭"可匹配"白切鸡"、"招牌烧鹅饭"可匹配"烧鹅"
+        const core = nl.replace(/(饭|面|粉|汤|粥|套餐)$/, '');
+        if (core.length > 0 && core.endsWith(optName)) return true;
+        return false;
       });
       return linked || named;
     }

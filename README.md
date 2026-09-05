@@ -1,21 +1,35 @@
 # 二维码点餐系统（xyms）
 
-真实开店场景 · 首期范围：**顾客扫码点餐 + 后厨接单 + 商家管菜品**
+真实开店场景 · 首期范围：**顾客扫码点餐 + 后厨接单 + 商家管菜品**（H5 网页版 + **微信小程序版**）
 
 ## 技术栈
 - Java 17 / Spring Boot 3.0.2 / MyBatis-Plus 3.5.7 / MySQL 8.0
 - 构建：Maven（IDEA 内置 Maven 3.8.1）
+- 小程序：原生微信小程序（WXML/WXSS/JS），微信开发者工具打开即可运行
 
 ## 项目结构
 ```
 xyms/
 ├── pom.xml                 # Maven 工程配置
+├── project.config.json     # 微信开发者工具根配置（miniprogramRoot 指向 miniprogram/）
+├── miniprogram/            # ★ 微信小程序端（顾客点餐 + 商家/后厨后台）
+│   ├── app.js / app.json / app.wxss
+│   ├── utils/              # config.js（接口地址）/ request.js（API 封装）/ util.js
+│   ├── components/spec-dialog/  # 选规格弹窗组件（单选/多选/双拼）
+│   └── pages/
+│       ├── index/          # 首页：选择桌台（模拟扫码进店）
+│       ├── menu/           # 顾客点餐（分类+菜品+选规格）
+│       ├── cart/           # 购物车（备注/调数量/提交订单）
+│       ├── orders/         # 我的订单（按用户过滤）
+│       ├── order-detail/   # 订单详情（顾客）
+│       ├── profile/        # 我的（切换桌台 + 商家后台入口）
+│       └── admin/          # 商家/后厨：工作台/接单/订单详情/菜品/菜品编辑/分类/桌台/收银统计
 ├── sql/
 │   └── init.sql            # 建库建表脚本 + 示例数据
 └── src/
     ├── main/
     │   ├── java/com/ordering/
-    │   │   ├── controller/    # 接口层（顾客端/后厨端/商家端）
+    │   │   ├── controller/    # 接口层（顾客端/后厨端/商家端/用户）
     │   │   ├── service/       # 业务层
     │   │   ├── mapper/        # MyBatis-Plus 数据访问
     │   │   ├── entity/        # 实体（8 张表）
@@ -24,7 +38,8 @@ xyms/
     │   │   ├── config/        # 全局异常处理等
     │   │   └── QrOrderingApplication.java  # 启动类
     │   └── resources/
-    │       └── application.yml # 配置（端口 8080、MySQL 连接）
+    │       ├── application.yml # 配置（端口 8080、MySQL 连接）
+    │       └── static/         # H5 网页版（/admin 商家后台、/customer 顾客端）
     └── test/
 ```
 
@@ -36,6 +51,41 @@ xyms/
 5. **验证**：浏览器访问 `http://localhost:8080/api/menu/dishes?shopId=1`，返回菜品 JSON 即成功。
 
 > 数据库连接默认使用 root / 79365920，可在 `application.yml` 中修改，或用环境变量 `DB_PASSWORD` 覆盖。
+
+## 微信小程序端（miniprogram/）
+
+顾客点餐、商家/后厨后台都已小程序化，原生实现，无需 npm 依赖。
+
+### 运行步骤
+1. **启动后端**：按上面「快速开始」跑起 Spring Boot（`http://localhost:8080`）。
+2. **打开小程序**：微信开发者工具 → 导入项目 → 目录选择 **`E:\2026shixun\xyms\miniprogram`**（AppID 已配置，也可换成你自己的；工具设置里已关闭「校验合法域名」以支持本地 http 联调）。
+3. **编译运行**：模拟器中打开首页选择桌台 → 进入点餐。如需真机预览，把 `miniprogram/utils/config.js` 的 `BASE_URL` 改为电脑局域网 IP（如 `http://192.168.1.100:8080`），并保证手机与电脑同一网络。
+
+### 小程序功能清单
+| 端 | 页面 | 功能 |
+|---|---|---|
+| 顾客 | index | 选择桌台（真实场景由桌台小程序码 scene 参数带入，自动进店） |
+| 顾客 | menu | 分类导航 + 菜品列表 + 选规格弹窗（单选/多选/双拼、份数、备注） |
+| 顾客 | cart | 购物车调数量/备注/移除 + 提交订单 |
+| 顾客 | orders / order-detail | 我的订单（按用户过滤）+ 订单详情 |
+| 顾客 | profile | 桌台切换 + 商家后台入口 |
+| 商家 | admin/home | 工作台宫格导航 |
+| 商家 | admin/kitchen | 接单列表：接单→制作→上菜→完成 一键流转 |
+| 商家 | admin/order-detail | 订单明细 + 逐道菜制作状态（开始制作/已出餐/退菜） |
+| 商家 | admin/dishes + dish-edit | 菜品管理：分类筛选、关键字搜索、价格排序、上下架、增删改、规格组配置 |
+| 商家 | admin/clearance | 估清下架 / 重新上架：关键字命中菜品批量下架，自动停用关联规格项；重新上架可恢复菜品、分类与规格项 |
+| 商家 | admin/categories | 分类增删改、启停 |
+| 商家 | admin/tables | 桌台增删改 |
+| 商家 | admin/stats | 收银统计：日/周/月/季入账汇总 + 销量占比饼图 + 销量排行 |
+
+### 小程序身份说明
+- 小程序首次启动会在本地生成唯一 openid，调用后端新增的 `POST /api/user/login` 自动注册并换取 `userId`；
+- 下单时携带 `userId` 落库到 `orders.user_id`（表结构原有字段，无需改表），「我的订单」按 `userId` 过滤；
+- 后端 `GET /api/order/list` 新增可选参数 `userId`（不传仍查全部，兼容原 H5 商家后台）。
+
+### 小程序端与 H5 端差异
+- 小程序端功能与网页版商家后台保持一致（含估清下架/重新上架）；
+- 真实支付（微信支付）与正式发布域名（https）需在公众平台配置，当前联调直接下单即视为「已支付待制作」。
 
 ## 已实现接口（首期）
 | 模块 | 接口 | 说明 |
