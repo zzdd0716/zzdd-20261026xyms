@@ -29,9 +29,12 @@ public interface OrderService {
     List<OrderItem> listItemsByOrderId(Long orderId);
 
     /**
-     * 后厨按状态查询订单列表（按时间倒序）
+     * 查询订单列表（按时间倒序）
+     *
+     * @param status 订单状态过滤（可空，为空查全部）
+     * @param userId 下单用户ID过滤（可空；小程序"我的订单"按此过滤，商家端传空查全部）
      */
-    List<Orders> listOrdersByStatus(Integer status);
+    List<Orders> listOrdersByStatus(Integer status, Long userId);
 
     /**
      * 更新订单状态（接单 / 制作中 / 上菜 / 完成）

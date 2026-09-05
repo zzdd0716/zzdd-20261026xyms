@@ -52,13 +52,15 @@ public class OrderController {
         return Result.success(orderService.listItemsByOrderId(orderId));
     }
 
-    /** 后厨：按状态查询订单（status 为空查全部） */
+    /** 查询订单列表：status 为空查全部；userId 非空时仅查该用户订单（小程序"我的订单"） */
     @GetMapping("/list")
-    @Operation(summary = "后厨查订单", description = "按状态查询订单列表，按下单时间倒序；status 为空查全部")
+    @Operation(summary = "查询订单列表", description = "按状态查询订单列表，按下单时间倒序；status 为空查全部；传 userId 时仅查该用户订单")
     public Result<List<Orders>> list(
             @Parameter(description = "订单状态：0待支付 1已支付待制作 2制作中 3已上菜 4已完成（可空）", example = "1")
-            @RequestParam(required = false) Integer status) {
-        return Result.success(orderService.listOrdersByStatus(status));
+            @RequestParam(required = false) Integer status,
+            @Parameter(description = "下单用户ID（可空；小程序'我的订单'按此过滤）", example = "1")
+            @RequestParam(required = false) Long userId) {
+        return Result.success(orderService.listOrdersByStatus(status, userId));
     }
 
     /** 后厨：更新订单状态 */

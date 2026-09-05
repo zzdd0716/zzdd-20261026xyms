@@ -122,10 +122,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<Orders> listOrdersByStatus(Integer status) {
+    public List<Orders> listOrdersByStatus(Integer status, Long userId) {
         LambdaQueryWrapper<Orders> wrapper = new LambdaQueryWrapper<>();
         if (status != null) {
             wrapper.eq(Orders::getStatus, status);
+        }
+        if (userId != null) {
+            // 小程序"我的订单"：仅查该用户下的单
+            wrapper.eq(Orders::getUserId, userId);
         }
         wrapper.orderByDesc(Orders::getCreateTime);
         List<Orders> list = ordersMapper.selectList(wrapper);
