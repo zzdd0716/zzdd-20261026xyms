@@ -6,7 +6,23 @@
   text-align: center;
   color: #fff;
 }
-.avatar { font-size: 88rpx; margin-bottom: 12rpx; }
+.avatar-wrap { position: relative; width: 140rpx; height: 140rpx; margin: 0 auto 16rpx; }
+.avatar-img { width: 140rpx; height: 140rpx; border-radius: 50%; background: #fff; }
+.avatar-default { width: 140rpx; height: 140rpx; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-size: 72rpx; }
+.avatar-edit {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.15);
+}
 .hero-name { font-size: 36rpx; font-weight: 700; }
 .hero-sub { font-size: 26rpx; opacity: 0.92; margin-top: 8rpx; }
 
@@ -25,8 +41,37 @@
   border-bottom: 2rpx solid #f6f7f9;
 }
 .menu-row:last-child { border-bottom: none; }
-.menu-icon { font-size: 36rpx; margin-right: 20rpx; }
+.menu-icon { font-size: 36rpx; margin-right: 20rpx; width: 44rpx; display: flex; align-items: center; justify-content: center; }
 .menu-text { flex: 1; font-size: 30rpx; color: #303133; }
 .menu-arrow { font-size: 34rpx; color: #c0c4cc; }
+
+.table-tip {
+  font-size: 22rpx;
+  color: #f56c6c;
+  padding: 0 8rpx 20rpx;
+  border-bottom: 2rpx solid #f6f7f9;
+}
+
+/* 迷你桌子图标 */
+.table-icon-mini { position: relative; width: 44rpx; height: 36rpx; }
+.table-top-mini {
+  width: 42rpx;
+  height: 8rpx;
+  background: linear-gradient(180deg, #c8895a, #a0683c);
+  border-radius: 4rpx;
+  position: absolute;
+  top: 10rpx;
+  left: 1rpx;
+}
+.table-leg-mini {
+  width: 6rpx;
+  height: 18rpx;
+  background: linear-gradient(180deg, #a0683c, #7a4e2a);
+  position: absolute;
+  top: 18rpx;
+  border-radius: 0 0 3rpx 3rpx;
+}
+.leg-left-mini { left: 8rpx; }
+.leg-right-mini { right: 8rpx; }
 
 .page-tip { margin: 40rpx 40rpx 0; font-size: 22rpx; color: #b0b3ba; text-align: center; line-height: 1.7; }

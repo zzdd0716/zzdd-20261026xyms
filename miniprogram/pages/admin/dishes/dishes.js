@@ -50,7 +50,7 @@ Page({
 
   switchCate(e) {
     const id = e.currentTarget.dataset.id;
-    this.setData({ activeCate: (id === null || id === undefined || id === 'null') ? null : id });
+    this.setData({ activeCate: (id === null || id === undefined || id === 'null' || id === 'all') ? null : id });
     this.refreshView();
   },
 

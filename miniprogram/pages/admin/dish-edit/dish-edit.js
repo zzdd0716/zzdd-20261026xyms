@@ -3,6 +3,7 @@
  */
 const api = require('../../../utils/request');
 const util = require('../../../utils/util');
+const config = require('../../../utils/config');
 const app = getApp();
 
 const GROUP_TYPE_NAMES = ['单选', '多选'];
@@ -109,6 +110,45 @@ Page({
 
   toggleStatus(e) {
     this.setData({ 'form.status': e.detail.value ? 1 : 0 });
+  },
+
+  chooseImage() {
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      sourceType: ['album', 'camera'],
+      success: (res) => {
+        const tempFile = res.tempFiles[0];
+        wx.showLoading({ title: '上传中…' });
+        wx.uploadFile({
+          url: config.BASE_URL + '/api/upload/image',
+          filePath: tempFile.tempFilePath,
+          name: 'file',
+          success: (uploadRes) => {
+            wx.hideLoading();
+            try {
+              const data = JSON.parse(uploadRes.data);
+              if (data.code === 200) {
+                this.setData({ 'form.image': config.BASE_URL + data.url });
+                util.toast('上传成功', 'success');
+              } else {
+                util.toast('上传失败：' + (data.message || ''));
+              }
+            } catch (e) {
+              util.toast('上传失败');
+            }
+          },
+          fail: () => {
+            wx.hideLoading();
+            util.toast('上传失败，请检查后端是否启动');
+          }
+        });
+      }
+    });
+  },
+
+  removeImage() {
+    this.setData({ 'form.image': '' });
   },
 
   // ===== 规格组 =====
@@ -230,7 +270,8 @@ Page({
       categoryId: f.categoryId,
       price: Number(f.price),
       stock: Number(f.stock) || 0,
-      status: f.status,
+      // 库存大于0自动上架，库存为0自动下架
+      status: (Number(f.stock) || 0) > 0 ? 1 : 0,
       image: f.image,
       description: f.description,
       specs: f.specs.map(g => ({

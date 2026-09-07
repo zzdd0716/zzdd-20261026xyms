@@ -31,8 +31,17 @@
     </view>
 
     <view class="form-row">
-      <text class="form-label">图片 URL</text>
-      <input class="form-input" placeholder="菜品图片链接（可空）" value="{{form.image}}" data-field="image" bindinput="onInput" />
+      <text class="form-label">菜品图片</text>
+      <view class="image-upload-area">
+        <view wx:if="{{form.image}}" class="preview-wrap">
+          <image src="{{form.image}}" class="dish-preview" mode="aspectFill" bindtap="chooseImage" />
+          <view class="image-remove" catchtap="removeImage">✕</view>
+        </view>
+        <view wx:else class="image-upload-btn" bindtap="chooseImage">
+          <text class="upload-icon">＋</text>
+          <text class="upload-text">点击上传图片</text>
+        </view>
+      </view>
     </view>
 
     <view class="form-row">

@@ -37,9 +37,17 @@ const del = (url) => request(url, 'DELETE');
 
 const api = {
   // ================= 用户 =================
-  /** 登录：openid 换 userId（不存在自动注册） */
-  login(openid) {
-    return post('/api/user/login', { openid });
+  /** 登录：wx.login 的 code 换用户信息（不存在自动注册） */
+  login(code) {
+    return post('/api/user/login', { code });
+  },
+  /** 设置/取消管理员 */
+  setAdmin(userId, isAdmin) {
+    return post('/api/user/admin/set', { userId, isAdmin });
+  },
+  /** 更新用户昵称和头像 */
+  updateUser(userId, nickname, avatar) {
+    return post('/api/user/update', { userId, nickname, avatar });
   },
 
   // ================= 顾客端：菜单 =================
@@ -96,6 +104,10 @@ const api = {
   /** 删除菜品 */
   deleteDish(id) {
     return del('/api/admin/dish/' + id);
+  },
+  /** 批量更新规格选项状态（单独操作，不影响菜品） */
+  updateSpecOptionsStatus(ids, status) {
+    return post('/api/admin/spec-options/status', { ids, status });
   },
 
   // ================= 商家：分类管理 =================

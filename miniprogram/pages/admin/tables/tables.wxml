@@ -12,6 +12,7 @@
         <view class="table-meta">{{item.seatCount}} 人 · 桌码 {{item.qrCode}} · {{item.status === 1 ? '空闲' : (item.status === 2 ? '用餐中' : '停用')}}</view>
       </view>
       <view class="table-actions">
+        <view class="mini-btn" data-item="{{item}}" bindtap="showQrcode">二维码</view>
         <view class="mini-btn" data-item="{{item}}" bindtap="openEdit">编辑</view>
         <view class="mini-btn danger" data-id="{{item.id}}" data-no="{{item.tableNo}}" bindtap="remove">删除</view>
       </view>
@@ -39,6 +40,19 @@
       <view class="dialog-actions">
         <view class="btn-ghost dlg-btn" bindtap="closeDialog">取消</view>
         <view class="btn-primary dlg-btn" disabled="{{saving}}" bindtap="save">{{saving ? '保存中…' : '保存'}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 二维码弹窗 -->
+  <view class="modal-mask" wx:if="{{qrcodeVisible}}" bindtap="closeQrcode">
+    <view class="dialog qrcode-dialog" catchtap="noop">
+      <view class="dialog-title">桌台 {{qrcodeTableNo}} 二维码</view>
+      <view class="qrcode-tip">微信扫码直接进入该桌台点餐</view>
+      <image class="qrcode-img" src="{{qrcodeUrl}}" mode="aspectFit" show-menu-by-longpress="true" />
+      <view class="qrcode-hint">长按图片可保存到手机</view>
+      <view class="dialog-actions">
+        <view class="btn-primary dlg-btn" bindtap="closeQrcode">关闭</view>
       </view>
     </view>
   </view>

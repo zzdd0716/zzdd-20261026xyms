@@ -71,18 +71,22 @@ Component({
       this.recalc();
     },
 
-    /** 构建视图用规格列表：给每个 option 打上 selected 标记（WXML 无法调用 js 方法） */
+    /** 构建视图用规格列表：给每个 option 打上 selected 标记（WXML 无法调用 js 方法），并过滤已停用的组和选项 */
     buildViewSpecs() {
       const dish = this.data.dish;
       const selections = this.data.selections;
       if (!dish) { this.setData({ viewSpecs: [] }); return; }
-      const viewSpecs = (dish.specs || []).map(g => ({
-        ...g,
-        options: (g.options || []).map(o => ({
-          ...o,
-          selected: (selections[String(g.id)] || []).indexOf(o.id) >= 0
-        }))
-      }));
+      const viewSpecs = (dish.specs || [])
+        .filter(g => g.status == null || g.status === 1) // 过滤已停用的规格组
+        .map(g => ({
+          ...g,
+          options: (g.options || [])
+            .filter(o => o.status == null || o.status === 1) // 过滤已停用的规格选项
+            .map(o => ({
+              ...o,
+              selected: (selections[String(g.id)] || []).indexOf(o.id) >= 0
+            }))
+        }));
       this.setData({ viewSpecs });
     },
 

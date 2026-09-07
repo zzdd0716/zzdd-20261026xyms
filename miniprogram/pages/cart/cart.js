@@ -112,8 +112,12 @@ Page({
         content: '订单已送达后厨，请耐心等待上菜\n订单号：' + (order.orderNo || ''),
         confirmText: '查看订单',
         confirmColor: '#ff6b2c',
-        success: () => {
-          wx.switchTab({ url: '/pages/orders/orders' });
+        success: (res) => {
+          if (res.confirm) {
+            wx.switchTab({ url: '/pages/orders/orders' });
+          } else {
+            wx.switchTab({ url: '/pages/menu/menu' });
+          }
         }
       });
     }).catch(e => {

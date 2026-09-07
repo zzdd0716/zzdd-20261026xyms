@@ -14,7 +14,9 @@
     "pages/admin/dish-edit/dish-edit",
     "pages/admin/categories/categories",
     "pages/admin/tables/tables",
-    "pages/admin/stats/stats"
+    "pages/admin/stats/stats",
+    "pages/admin/stock/stock",
+    "pages/admin/admin-manage/admin-manage"
   ],
   "window": {
     "navigationBarBackgroundColor": "#ff6b2c",

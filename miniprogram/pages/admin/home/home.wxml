@@ -21,7 +21,11 @@
       <view class="grid-desc">分类增删改</view>
     </view>
     <view class="grid-item" data-page="/pages/admin/tables/tables" bindtap="go">
-      <view class="grid-icon">🪑</view>
+      <view class="grid-icon table-icon">
+        <view class="table-top"></view>
+        <view class="table-leg leg-left"></view>
+        <view class="table-leg leg-right"></view>
+      </view>
       <view class="grid-name">桌台管理</view>
       <view class="grid-desc">桌码增删改</view>
     </view>
@@ -29,6 +33,16 @@
       <view class="grid-icon">💰</view>
       <view class="grid-name">收银统计</view>
       <view class="grid-desc">入账汇总 · 销量排行</view>
+    </view>
+    <view class="grid-item" data-page="/pages/admin/stock/stock" bindtap="go">
+      <view class="grid-icon">📦</view>
+      <view class="grid-name">库存管理</view>
+      <view class="grid-desc">快速改库存 · 一键补货</view>
+    </view>
+    <view class="grid-item" data-page="/pages/admin/admin-manage/admin-manage" bindtap="go">
+      <view class="grid-icon">👤</view>
+      <view class="grid-name">管理员设置</view>
+      <view class="grid-desc">通过用户ID添加管理员</view>
     </view>
   </view>
 

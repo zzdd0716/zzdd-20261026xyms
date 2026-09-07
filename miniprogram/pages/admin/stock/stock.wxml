@@ -1,0 +1,55 @@
+<view class="page">
+  <view class="top-bar">
+    <scroll-view scroll-x class="filter-bar">
+      <view class="filter-item {{activeCate === 'all' ? 'active' : ''}}" data-id="all" bindtap="switchCate">全部</view>
+      <view class="filter-item {{activeCate === item.id ? 'active' : ''}}"
+            wx:for="{{categories}}" wx:key="id"
+            data-id="{{item.id}}" bindtap="switchCate">{{item.name}}</view>
+    </scroll-view>
+
+    <view class="search-row">
+      <view class="select-all-btn" bindtap="toggleSelectAll">
+        <view class="checkbox {{allSelected ? 'checked' : ''}}">{{allSelected ? '✓' : ''}}</view>
+        <text>全选</text>
+      </view>
+      <input class="search-input" placeholder="搜索菜品名称" value="{{keyword}}" bindinput="onKeywordInput" />
+      <view class="btn-plain restock-btn" bindtap="restockAll">补货999</view>
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="empty-tip"><text class="empty-icon">⏳</text>加载中…</view>
+
+  <block wx:elif="{{filteredList.length > 0}}">
+    <view class="stock-card" wx:for="{{filteredList}}" wx:key="id">
+      <view class="checkbox-wrap" data-id="{{item.id}}" bindtap="toggleSelect">
+        <view class="checkbox {{item.checked ? 'checked' : ''}}">{{item.checked ? '✓' : ''}}</view>
+      </view>
+
+      <view class="stock-info">
+        <view class="dish-name">{{item.name}}</view>
+        <view class="dish-cate">{{item.cateName}} · {{item.status === 1 ? '上架中' : '已下架'}}</view>
+      </view>
+
+      <view class="stock-control">
+        <view class="stock-current {{item.stock <= 0 ? 'stock-out' : (item.stock <= 10 ? 'stock-low' : '')}}">
+          {{item.stock}}
+        </view>
+        <input class="stock-input" type="number" value="{{item.editingStock}}"
+               data-id="{{item.id}}" bindinput="onStockInput" />
+        <view class="btn-primary save-btn" data-id="{{item.id}}" bindtap="saveStock">保存</view>
+      </view>
+    </view>
+  </block>
+
+  <view wx:else class="empty-tip">
+    <text class="empty-icon">📦</text>暂无菜品
+  </view>
+
+  <!-- 底部批量操作栏（有选中项时显示） -->
+  <view wx:if="{{selectedIds.length > 0}}" class="bottom-actions">
+    <view class="selected-info">已选 {{selectedIds.length}} 项</view>
+    <view class="action-btn" bindtap="batchSetStock">设库存</view>
+    <view class="action-btn" bindtap="batchOnline">上架</view>
+    <view class="action-btn danger" bindtap="batchOffline">下架</view>
+  </view>
+</view>

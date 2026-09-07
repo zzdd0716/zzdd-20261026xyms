@@ -23,10 +23,13 @@ module.exports = function (n) {
           <text class="order-no">单号 {{item.orderNo}}</text>
           <text class="tag tag-new" style="margin-left:12rpx;">已下单</text>
         </view>
-        <text class="order-table">🪑 {{item.tableNo}}</text>
+        <text class="order-table">桌号：{{item.tableNo}}</text>
       </view>
       <view class="order-items" data-id="{{item.id}}" bindtap="goDetail" wx:if="{{item.itemsPreview}}">
         {{item.itemsPreview}}
+      </view>
+      <view class="order-remark" wx:if="{{item.remark || item.remarks}}">
+        <text class="remark-label">备注：</text>{{item.remark || item.remarks}}
       </view>
       <view class="order-foot">
         <text class="order-time">{{item.createTime || ''}}</text>

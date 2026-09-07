@@ -5,12 +5,15 @@ import com.ordering.entity.Category;
 import com.ordering.entity.Dish;
 import com.ordering.entity.DiningTable;
 import com.ordering.service.ShopAdminService;
+import com.ordering.service.WechatService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -23,6 +26,7 @@ import java.util.List;
 public class ShopAdminController {
 
     private final ShopAdminService shopAdminService;
+    private final WechatService wechatService;
 
     // ===== 分类管理 =====
     @GetMapping("/categories")
@@ -93,6 +97,31 @@ public class ShopAdminController {
             @Parameter(description = "桌台ID", required = true, example = "1")
             @PathVariable Long id) {
         shopAdminService.deleteTable(id);
+        return Result.success();
+    }
+
+    @GetMapping("/table/qrcode")
+    @Operation(summary = "桌台小程序码", description = "生成指定桌台的微信小程序码，扫码直接进入该桌台点餐页")
+    public void tableQrcode(
+            @Parameter(description = "桌台ID", required = true, example = "1")
+            @RequestParam Long tableId,
+            HttpServletResponse response) throws IOException {
+        byte[] image = wechatService.getWxacode(String.valueOf(tableId), "pages/index/index");
+        response.setContentType("image/jpeg");
+        response.setHeader("Content-Disposition", "inline; filename=table_" + tableId + ".jpg");
+        response.getOutputStream().write(image);
+        response.getOutputStream().flush();
+    }
+
+    // ===== 规格选项管理 =====
+    @PostMapping("/spec-options/status")
+    @Operation(summary = "批量更新规格选项状态", description = "单独启用/停用规格选项，不影响菜品本身状态")
+    public Result<Void> updateSpecOptionsStatus(@RequestBody java.util.Map<String, Object> body) {
+        @SuppressWarnings("unchecked")
+        java.util.List<Long> ids = ((java.util.List<?>) body.get("ids")).stream()
+                .map(x -> Long.valueOf(x.toString())).collect(java.util.stream.Collectors.toList());
+        Integer status = Integer.valueOf(body.get("status").toString());
+        shopAdminService.updateSpecOptionsStatus(ids, status);
         return Result.success();
     }
 }

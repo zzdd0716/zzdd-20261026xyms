@@ -1,0 +1,31 @@
+<view class="page">
+  <view class="card">
+    <view class="tip-box">
+      <view class="tip-icon">ℹ️</view>
+      <view class="tip-content">
+        <text class="tip-title">操作说明</text>
+        <text class="tip-text">让对方在「我的」页面查看自己的用户ID，把ID告诉你，输入后即可设置管理员权限。</text>
+      </view>
+    </view>
+
+    <view class="input-group">
+      <text class="input-label">用户ID</text>
+      <input class="input-field" type="number" placeholder="请输入对方的用户ID" placeholder-class="input-placeholder" value="{{inputUserId}}" bindinput="onInput" />
+    </view>
+
+    <view class="button-group">
+      <view class="btn btn-primary" bindtap="setAdmin" disabled="{{loading}}">
+        <text class="btn-icon">✓</text>
+        <text>设为管理员</text>
+      </view>
+      <view class="btn btn-outline" bindtap="removeAdmin" disabled="{{loading}}">
+        <text class="btn-icon">✕</text>
+        <text>取消管理员</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="footer-note">
+    <text>无法通过微信号查找用户，只能通过用户ID设置</text>
+  </view>
+</view>

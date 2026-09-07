@@ -17,7 +17,10 @@ module.exports = function (n) {
   <!-- 顶部门店信息 -->
   <view class="header">
     <view class="header-shop">
-      <view class="shop-name">🍜 扫码点餐</view>
+      <view class="shop-name">
+        <image class="shop-logo" src="/images/logo.png" mode="aspectFill"></image>
+        <text>禧粤美食</text>
+      </view>
       <view class="shop-meta" wx:if="{{tableNo}}">桌号：{{tableNo}} · 选好菜加入购物车</view>
     </view>
   </view>
@@ -87,11 +90,17 @@ module.exports = function (n) {
         <text class="cart-popup-clear" bindtap="clearCart">清空</text>
       </view>
       <scroll-view scroll-y class="cart-popup-list">
-        <view class="cart-popup-item" wx:for="{{cartList}}" wx:key="index" wx:for-item="item">
+        <view class="cart-popup-item" wx:for="{{cartList}}" wx:key="key" wx:for-item="item">
           <view class="cart-item-info">
             <view class="cart-item-name">{{item.name}}</view>
             <view class="cart-item-spec" wx:if="{{item.specText}}">{{item.specText}}</view>
-            <view class="cart-item-remark" wx:if="{{item.remark}}">备注：{{item.remark}}</view>
+            <input
+              class="cart-item-remark-input"
+              placeholder="口味备注（选填）"
+              placeholder-class="remark-placeholder"
+              value="{{item.remark}}"
+              data-key="{{item.key}}"
+              bindinput="onCartRemarkInput" />
             <view class="cart-item-price">¥{{fmt(item.price)}}</view>
           </view>
           <view class="cart-item-stepper">

@@ -82,6 +82,21 @@
   background: #fff;
 }
 .dish-row.checked .check-box { background: #ff6b2c; border-color: #ff6b2c; }
+.check-box.checked { background: #ff6b2c; border-color: #ff6b2c; }
+
+.select-all-btn {
+  display: flex;
+  align-items: center;
+  font-size: 24rpx;
+  color: #666;
+}
+.select-all-btn .check-box {
+  width: 32rpx;
+  height: 32rpx;
+  line-height: 28rpx;
+  margin-right: 8rpx;
+  font-size: 22rpx;
+}
 
 .dish-main { flex: 1; min-width: 0; }
 .dish-name { font-size: 30rpx; font-weight: 600; color: #303133; }
@@ -90,8 +105,23 @@
 /* 关联规格项 */
 .change-dish { margin-bottom: 12rpx; }
 .change-dish-name { font-size: 28rpx; font-weight: 600; color: #303133; margin-bottom: 6rpx; }
-.change-item { font-size: 24rpx; color: #e6872c; line-height: 1.8; padding-left: 16rpx; }
+.change-item { font-size: 24rpx; color: #e6872c; line-height: 1.8; padding-left: 16rpx; display: flex; align-items: center; }
 .change-arrow { margin-right: 6rpx; color: #b0b3ba; }
+.spec-check { width: 32rpx; height: 32rpx; line-height: 28rpx; margin-right: 10rpx; font-size: 22rpx; }
+
+/* 底部按钮 */
+.btn-secondary {
+  background: #fff;
+  color: #ff6b2c;
+  border: 2rpx solid #ff6b2c;
+  border-radius: 44rpx;
+  text-align: center;
+  font-size: 28rpx;
+  font-weight: 600;
+  padding: 20rpx 0;
+  margin-bottom: 16rpx;
+}
+.btn-secondary[disabled] { opacity: 0.5; }
 
 /* 底部执行 */
 .footer {

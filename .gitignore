@@ -26,3 +26,16 @@ src/main/resources/application-local.yml
 # --- 微信开发者工具私有配置 ---
 project.private.config.json
 **/project.private.config.json
+
+# --- 临时截图和文件（不入库） ---
+/*.png
+/*.jpg
+/*.jpeg
+/*.msi
+/*.json
+!package.json
+!package-lock.json
+uploads/
+draft_*/
+工作日志*.md
+企业小程序*.md

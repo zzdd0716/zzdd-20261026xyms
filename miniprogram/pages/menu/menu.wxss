@@ -7,7 +7,8 @@
   color: #fff;
   flex-shrink: 0;
 }
-.shop-name { font-size: 36rpx; font-weight: 700; }
+.shop-name { font-size: 36rpx; font-weight: 700; display: flex; align-items: center; }
+.shop-logo { width: 56rpx; height: 56rpx; border-radius: 50%; margin-right: 16rpx; background: #fff; }
 .shop-meta { font-size: 24rpx; opacity: 0.92; margin-top: 8rpx; }
 
 /* 搜索栏 */
@@ -218,6 +219,17 @@
 .cart-item-name { font-size: 28rpx; color: #303133; font-weight: 600; }
 .cart-item-spec { font-size: 24rpx; color: #909399; margin-top: 6rpx; }
 .cart-item-remark { font-size: 24rpx; color: #e6a23c; margin-top: 4rpx; }
+.cart-item-remark-input {
+  font-size: 24rpx;
+  color: #e6a23c;
+  margin-top: 6rpx;
+  padding: 6rpx 12rpx;
+  background: #fff8f0;
+  border-radius: 8rpx;
+  min-height: 40rpx;
+  line-height: 40rpx;
+}
+.remark-placeholder { color: #c0c4cc; font-size: 22rpx; }
 .cart-item-price { font-size: 28rpx; color: #ff6b2c; font-weight: 700; margin-top: 6rpx; }
 .cart-item-stepper { display: flex; align-items: center; flex-shrink: 0; margin-left: 16rpx; width: 160rpx; justify-content: flex-end; }
 .cart-popup .step-btn {

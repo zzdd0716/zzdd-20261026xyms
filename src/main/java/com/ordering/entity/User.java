@@ -32,6 +32,9 @@ public class User {
     /** 状态：1正常 0禁用 */
     private Integer status;
 
+    /** 是否管理员：0普通用户 1管理员 */
+    private Integer isAdmin;
+
     private LocalDateTime createTime;
 
     private LocalDateTime updateTime;

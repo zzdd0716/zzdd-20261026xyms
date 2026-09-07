@@ -3,6 +3,7 @@ package com.ordering;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * 二维码点餐系统启动类
@@ -11,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 @MapperScan("com.ordering.mapper")
+@EnableScheduling
 public class QrOrderingApplication {
 
     public static void main(String[] args) {

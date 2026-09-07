@@ -77,7 +77,7 @@ view, text, input, textarea, button, image {
 .tag-success { background: #e8f7ee; color: #2ba471; }
 .tag-info { background: #eef3f8; color: #5a7ea8; }
 .tag-warn { background: #fdf3e7; color: #e6872c; }
-.tag-danger { background: #fdeeee; color: #e5484d; }
+.tag-danger { background: #fde2e2; color: #c62828; }
 .tag-muted { background: #f1f2f4; color: #909399; }
 .tag-new { background: #fff0e8; color: #ff6b2c; font-weight: 600; }
 

@@ -2,6 +2,7 @@ package com.ordering.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.ordering.dto.CashierRowDTO;
 import com.ordering.dto.CashierSummaryDTO;
 import com.ordering.dto.OrderCreateDTO;
@@ -60,6 +61,10 @@ public class OrderServiceImpl implements OrderService {
             if (dish == null || dish.getStatus() != 1) {
                 throw new RuntimeException("菜品不存在或已下架: " + item.getDishId());
             }
+            // 库存校验：stock>0 时校验库存，stock=0 表示不限量
+            if (dish.getStock() != null && dish.getStock() > 0 && dish.getStock() < item.getQuantity()) {
+                throw new RuntimeException("菜品「" + dish.getName() + "」库存不足，仅剩 " + dish.getStock() + " 份");
+            }
             // 校验规格选择、计算加价、生成规格快照
             DishSpecService.ResolveResult spec = dishSpecService.resolve(dish.getId(), item.getSpecOptionIds());
             specResults.add(spec);
@@ -99,9 +104,23 @@ public class OrderServiceImpl implements OrderService {
             oi.setStatus(0);
             orderItemMapper.insert(oi);
 
-            // 累加销量
-            dish.setSoldCount(dish.getSoldCount() + item.getQuantity());
-            dishMapper.updateById(dish);
+            // 扣减库存 + 累加销量 + 库存到0自动下架（一次更新完成，防止后续updateById覆盖库存）
+            if (dish.getStock() != null && dish.getStock() > 0) {
+                UpdateWrapper<Dish> stockWrapper = new UpdateWrapper<>();
+                stockWrapper.eq("id", dish.getId())
+                           .ge("stock", item.getQuantity())
+                           .setSql("stock = stock - " + item.getQuantity())
+                           .setSql("sold_count = sold_count + " + item.getQuantity())
+                           .setSql("status = CASE WHEN stock - " + item.getQuantity() + " <= 0 THEN 0 ELSE status END");
+                int updated = dishMapper.update(null, stockWrapper);
+                if (updated == 0) {
+                    throw new RuntimeException("菜品「" + dish.getName() + "」库存不足，下单失败");
+                }
+            } else {
+                // 不限量菜品只累加销量
+                dish.setSoldCount(dish.getSoldCount() + item.getQuantity());
+                dishMapper.updateById(dish);
+            }
         }
 
         return order;

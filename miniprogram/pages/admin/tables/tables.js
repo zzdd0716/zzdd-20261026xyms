@@ -3,6 +3,7 @@
  */
 const api = require('../../../utils/request');
 const util = require('../../../utils/util');
+const config = require('../../../utils/config');
 const app = getApp();
 
 Page({
@@ -11,7 +12,10 @@ Page({
     loading: true,
     dialogVisible: false,
     form: { id: null, tableNo: '', seatCount: 4, status: 1 },
-    saving: false
+    saving: false,
+    qrcodeVisible: false,
+    qrcodeUrl: '',
+    qrcodeTableNo: ''
   },
 
   onShow() {
@@ -20,7 +24,10 @@ Page({
 
   load() {
     api.listTables(app.globalData.shopId).then(list => {
-      this.setData({ tables: list || [], loading: false });
+      const sorted = (list || []).slice().sort((a, b) =>
+        String(a.tableNo).localeCompare(String(b.tableNo), undefined, { numeric: true, sensitivity: 'base' })
+      );
+      this.setData({ tables: sorted, loading: false });
     }).catch(e => {
       this.setData({ loading: false });
       util.toast('加载失败：' + e.message);
@@ -44,6 +51,16 @@ Page({
 
   closeDialog() {
     this.setData({ dialogVisible: false });
+  },
+
+  showQrcode(e) {
+    const t = e.currentTarget.dataset.item;
+    const url = config.BASE_URL + '/api/admin/table/qrcode?tableId=' + t.id + '&t=' + Date.now();
+    this.setData({ qrcodeVisible: true, qrcodeUrl: url, qrcodeTableNo: t.tableNo });
+  },
+
+  closeQrcode() {
+    this.setData({ qrcodeVisible: false });
   },
 
   onTableNoInput(e) {

@@ -1,0 +1,213 @@
+.page {
+  padding: 20rpx;
+  padding-bottom: 160rpx;
+}
+
+.top-bar {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.filter-bar {
+  white-space: nowrap;
+  margin-bottom: 16rpx;
+}
+
+.filter-item {
+  display: inline-block;
+  padding: 10rpx 24rpx;
+  margin-right: 12rpx;
+  background: #f2f3f5;
+  border-radius: 24rpx;
+  font-size: 26rpx;
+  color: #666;
+}
+
+.filter-item.active {
+  background: #ff6b2c;
+  color: #fff;
+}
+
+.search-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.select-all-btn {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  flex-shrink: 0;
+  padding: 0 16rpx;
+  height: 72rpx;
+  font-size: 24rpx;
+  color: #666;
+}
+
+.checkbox {
+  width: 36rpx;
+  height: 36rpx;
+  border: 2rpx solid #ccc;
+  border-radius: 6rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.checkbox.checked {
+  background: #ff6b2c;
+  border-color: #ff6b2c;
+}
+
+.search-input {
+  flex: 1;
+  height: 72rpx;
+  line-height: 72rpx;
+  background: #f2f3f5;
+  border-radius: 12rpx;
+  padding: 0 20rpx;
+  font-size: 26rpx;
+}
+
+.restock-btn {
+  flex-shrink: 0;
+  padding: 0 20rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  font-size: 24rpx;
+  border: 1rpx solid #ff6b2c;
+  color: #ff6b2c;
+  border-radius: 12rpx;
+}
+
+.stock-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.checkbox-wrap {
+  flex-shrink: 0;
+  padding: 10rpx;
+}
+
+.stock-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.dish-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.dish-cate {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.stock-control {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  flex-shrink: 0;
+}
+
+.stock-current {
+  font-size: 24rpx;
+  color: #52c41a;
+  background: #f6ffed;
+  padding: 6rpx 14rpx;
+  border-radius: 8rpx;
+  white-space: nowrap;
+  min-width: 60rpx;
+  text-align: center;
+}
+
+.stock-current.stock-low {
+  color: #faad14;
+  background: #fffbe6;
+}
+
+.stock-current.stock-out {
+  color: #ff4d4f;
+  background: #fff2f0;
+}
+
+.stock-input {
+  width: 100rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  text-align: center;
+  background: #f2f3f5;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+}
+
+.save-btn {
+  padding: 0 24rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  font-size: 26rpx;
+  border-radius: 8rpx;
+}
+
+.bottom-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  padding: 20rpx;
+  gap: 12rpx;
+  box-shadow: 0 -2rpx 12rpx rgba(0,0,0,0.08);
+}
+
+.selected-info {
+  flex-shrink: 0;
+  font-size: 26rpx;
+  color: #ff6b2c;
+  margin-right: 8rpx;
+}
+
+.action-btn {
+  flex: 1;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  background: #ff6b2c;
+  color: #fff;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+}
+
+.action-btn.danger {
+  background: #ff4d4f;
+}
+
+.empty-tip {
+  text-align: center;
+  padding: 120rpx 0;
+  color: #999;
+  font-size: 28rpx;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  display: block;
+  margin-bottom: 20rpx;
+}

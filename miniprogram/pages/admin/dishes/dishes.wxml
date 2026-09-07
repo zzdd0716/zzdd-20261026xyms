@@ -18,7 +18,7 @@ module.exports = function (n) {
     <scroll-view scroll-x class="filter-bar">
       <view
         class="filter-item {{activeCate === null ? 'active' : ''}}"
-        data-id="{{null}}"
+        data-id="all"
         bindtap="switchCate">全部</view>
       <view
         class="filter-item {{activeCate === item.id ? 'active' : ''}}"
@@ -54,7 +54,7 @@ module.exports = function (n) {
       <view class="dish-info">
         <view class="dish-name-row">
           <text class="dish-name">{{item.name}}</text>
-          <text class="tag {{item.status === 1 ? 'tag-success' : 'tag-muted'}}">{{item.status === 1 ? '上架' : '下架'}}</text>
+          <text class="tag {{item.status === 1 ? 'tag-success' : 'tag-danger'}}">{{item.status === 1 ? '上架' : '下架'}}</text>
         </view>
         <view class="dish-meta">{{item.cateName}} · 已售 {{item.soldCount || 0}}</view>
         <view class="dish-price-row">

@@ -35,7 +35,8 @@ Page({
       const orders = (list || []).map(o => ({
         ...o,
         tableNo: this.tableNo(o.tableId),
-        itemsPreview: this.previewItems(o.items)
+        itemsPreview: this.previewItems(o.items),
+        remarks: this.collectRemarks(o.items)
       }));
       this.setData({ orders, loading: false });
       if (done) done();
@@ -56,6 +57,18 @@ Page({
     if (!items || !items.length) return '';
     const head = items.slice(0, 3).map(it => it.dishName + '×' + it.quantity).join('、');
     return items.length > 3 ? head + ' 等' + items.length + ' 项' : head;
+  },
+
+  /** 收集订单明细中的备注，合并显示 */
+  collectRemarks(items) {
+    if (!items || !items.length) return '';
+    const list = [];
+    items.forEach(it => {
+      if (it.remark && it.remark.trim()) {
+        list.push(it.dishName + '：' + it.remark.trim());
+      }
+    });
+    return list.join('；');
   },
 
   goDetail(e) {

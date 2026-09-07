@@ -31,4 +31,7 @@ public interface ShopAdminService {
     DiningTable saveTable(DiningTable table);
 
     void deleteTable(Long id);
+
+    // ===== 规格选项 =====
+    void updateSpecOptionsStatus(List<Long> ids, Integer status);
 }

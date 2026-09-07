@@ -16,7 +16,7 @@
 
   <!-- 分类筛选 -->
   <scroll-view scroll-x class="cate-bar" wx:if="{{categories.length > 0}}">
-    <view class="cate-item {{categoryId === null ? 'active' : ''}}" data-id="{{null}}" bindtap="switchCate">全部分类</view>
+    <view class="cate-item {{categoryId === null ? 'active' : ''}}" data-id="all" bindtap="switchCate">全部分类</view>
     <view
       class="cate-item {{categoryId === item.id ? 'active' : ''}}"
       wx:for="{{categories}}"
@@ -29,7 +29,10 @@
   <view class="card section">
     <view class="section-head">
       <text class="section-title">{{mode === 'down' ? '上架中的菜品' : '已下架的菜品'}}（{{matchedList.length}}）</text>
-      <text class="section-tip">勾选后可一键处理</text>
+      <view class="select-all-btn" bindtap="toggleSelectAll">
+        <view class="check-box {{allSelected ? 'checked' : ''}}">{{allSelected ? '✓' : ''}}</view>
+        <text>全选</text>
+      </view>
     </view>
 
     <view wx:if="{{loading}}" class="empty-tip"><text class="empty-icon">⏳</text>加载中…</view>
@@ -55,12 +58,15 @@
   <!-- 关联规格项影响 -->
   <view class="card section" wx:if="{{relatedList.length > 0}}">
     <view class="section-head">
-      <text class="section-title">关联规格项（{{specCountNum}}）</text>
-      <text class="section-tip">{{mode === 'down' ? '将自动停用' : '将自动恢复'}}</text>
+      <text class="section-title">{{mode === 'down' ? '关联规格项' : '已停用的规格项'}}（{{specCountNum}}）</text>
+      <text class="section-tip">{{mode === 'down' ? '将自动停用' : '可单独勾选恢复'}}</text>
     </view>
-    <view class="change-dish" wx:for="{{relatedList}}" wx:key="index" wx:for-item="ch">
+    <view class="change-dish" wx:for="{{relatedList}}" wx:key="dishId" wx:for-item="ch" wx:for-index="chIdx">
       <view class="change-dish-name">{{ch.dish.name}}</view>
-      <view class="change-item" wx:for="{{ch.matches}}" wx:key="index" wx:for-item="m">
+      <view class="change-item" wx:for="{{ch.matches}}" wx:key="optId" wx:for-item="m" wx:for-index="mIdx"
+            wx:if="{{mode === 'down' || m.option.status === 0}}"
+            data-opt-id="{{m.option.id}}" bindtap="{{mode === 'up' ? 'toggleSpec' : ''}}">
+        <view class="check-box spec-check {{m.selected ? 'checked' : ''}}" wx:if="{{mode === 'up'}}">{{m.selected ? '✓' : ''}}</view>
         <text class="change-arrow">↳</text>
         {{mode === 'down' ? '将停用' : '将恢复'}}规格「{{m.group.name}}」中的「{{m.option.name}}」
       </view>
@@ -69,6 +75,9 @@
 
   <!-- 底部一键执行 -->
   <view class="footer">
+    <view class="btn-secondary restore-spec-btn" wx:if="{{mode === 'up' && selectedSpecIds.length > 0}}" bindtap="restoreSelectedSpecs" disabled="{{running}}">
+      {{running ? '处理中…' : '仅恢复选中规格项（' + selectedSpecIds.length + ' 项）'}}
+    </view>
     <view class="btn-primary run-btn" disabled="{{running || actionCountNum === 0}}" bindtap="run">
       {{running ? '处理中…' : (mode === 'down' ? '一键下架' : '一键上架') + '（' + actionCountNum + ' 项）'}}
     </view>

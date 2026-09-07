@@ -31,3 +31,8 @@
 .form-input { flex: 1; font-size: 28rpx; background: #f6f7f9; border-radius: 10rpx; padding: 0 18rpx; height: 68rpx; line-height: 68rpx; box-sizing: border-box; }
 .dialog-actions { display: flex; gap: 20rpx; margin-top: 28rpx; }
 .dlg-btn { flex: 1; text-align: center; line-height: 76rpx; height: 76rpx; font-size: 28rpx; }
+
+.qrcode-dialog { text-align: center; padding: 40rpx 30rpx; }
+.qrcode-tip { font-size: 26rpx; color: #909399; margin-bottom: 24rpx; }
+.qrcode-img { width: 400rpx; height: 400rpx; margin: 0 auto; display: block; }
+.qrcode-hint { font-size: 24rpx; color: #c0c4cc; margin-top: 16rpx; margin-bottom: 24rpx; }

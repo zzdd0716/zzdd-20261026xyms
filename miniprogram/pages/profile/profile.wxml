@@ -1,7 +1,11 @@
 <view class="page">
   <view class="hero">
-    <view class="avatar">👤</view>
-    <view class="hero-name">微信用户</view>
+    <view class="avatar-wrap" bindtap="chooseAvatar">
+      <image wx:if="{{avatar}}" class="avatar-img" src="{{avatar}}" mode="aspectFill"></image>
+      <view wx:else class="avatar-default">👤</view>
+      <view class="avatar-edit">📷</view>
+    </view>
+    <view class="hero-name" bindtap="editNickname">{{nickname || '微信用户'}} ✏️</view>
     <view class="hero-sub" wx:if="{{tableNo}}">桌号 {{tableNo}}</view>
     <view class="hero-sub" wx:else>未选择桌台</view>
   </view>
@@ -15,11 +19,16 @@
 
   <view class="card menu-card">
     <view class="menu-row" bindtap="changeTable">
-      <text class="menu-icon">🪑</text>
+      <view class="menu-icon table-icon-mini">
+        <view class="table-top-mini"></view>
+        <view class="table-leg-mini leg-left-mini"></view>
+        <view class="table-leg-mini leg-right-mini"></view>
+      </view>
       <text class="menu-text">切换桌台</text>
       <text class="menu-arrow">›</text>
     </view>
-    <view class="menu-row" bindtap="goAdmin">
+    <view class="table-tip">根据餐桌位置上菜，请勿轻易换桌</view>
+    <view class="menu-row" bindtap="goAdmin" wx:if="{{isAdmin}}">
       <text class="menu-icon">⚙️</text>
       <text class="menu-text">商家管理后台</text>
       <text class="menu-arrow">›</text>

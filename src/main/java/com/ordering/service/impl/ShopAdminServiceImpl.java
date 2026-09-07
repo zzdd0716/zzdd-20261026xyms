@@ -98,13 +98,180 @@ public class ShopAdminServiceImpl implements ShopAdminService {
             }
             dishMapper.insert(dish);
         } else {
+            // 检测状态变化：下架→上架 或 上架→下架，联动处理关联规格选项
+            Dish oldDish = dishMapper.selectById(dish.getId());
+            boolean statusChangedToUp = oldDish != null
+                    && oldDish.getStatus() != null && oldDish.getStatus() == 0
+                    && dish.getStatus() != null && dish.getStatus() == 1;
+            boolean statusChangedToDown = oldDish != null
+                    && oldDish.getStatus() != null && oldDish.getStatus() == 1
+                    && dish.getStatus() != null && dish.getStatus() == 0;
             dishMapper.updateById(dish);
+            if (statusChangedToUp) {
+                restoreRelatedSpecOptions(dish);
+            } else if (statusChangedToDown) {
+                disableRelatedSpecOptions(dish);
+            }
         }
         // 保存规格配置：前端传了 specs 才处理（空数组 = 清空该菜品规格）
         if (dish.getSpecs() != null) {
             saveDishSpecs(dish.getId(), dish.getSpecs());
         }
         return dish;
+    }
+
+    /**
+     * 菜品重新上架时，恢复其他菜品规格组中关联到该菜品的选项
+     * 匹配规则与估清下架时一致：dishId 关联 / 选项名包含菜品名 / 菜品名去后缀后匹配
+     */
+    private void restoreRelatedSpecOptions(Dish dish) {
+        Long dishId = dish.getId();
+        // 从数据库取完整菜品信息（库存管理页保存时可能没传 name）
+        Dish fullDish = dishMapper.selectById(dishId);
+        String dishName = fullDish != null ? fullDish.getName() : dish.getName();
+        if (dishName == null || dishName.trim().isEmpty()) {
+            return;
+        }
+        String dishNameLower = dishName.trim().toLowerCase();
+        // 菜品名去后缀（饭/面/粉/汤/粥/套餐）后的核心名
+        String coreName = dishNameLower.replaceAll("(饭|面|粉|汤|粥|套餐)$", "");
+
+        // 查询所有菜品的规格组
+        List<DishSpecGroup> allGroups = dishSpecGroupMapper.selectList(null);
+        if (allGroups.isEmpty()) return;
+        List<Long> allGroupIds = allGroups.stream().map(DishSpecGroup::getId).collect(Collectors.toList());
+        List<DishSpecOption> allOptions = dishSpecOptionMapper.selectList(
+                new LambdaQueryWrapper<DishSpecOption>().in(DishSpecOption::getGroupId, allGroupIds));
+
+        boolean anyRestored = false;
+        for (DishSpecOption opt : allOptions) {
+            if (opt.getStatus() != null && opt.getStatus() == 1) continue; // 已启用的跳过
+            boolean matched = false;
+            // 方向1：dishId 关联
+            if (opt.getDishId() != null && opt.getDishId().equals(dishId)) {
+                matched = true;
+            }
+            // 方向2/3：名称匹配
+            if (!matched && opt.getName() != null) {
+                String optName = opt.getName().toLowerCase();
+                if (optName.contains(dishNameLower)) {
+                    matched = true;
+                } else if (!coreName.isEmpty() && coreName.endsWith(optName)) {
+                    matched = true;
+                }
+            }
+            if (matched) {
+                opt.setStatus(1);
+                dishSpecOptionMapper.updateById(opt);
+                anyRestored = true;
+            }
+        }
+
+        // 恢复规格组状态：组内有启用选项且组处于停用状态时，恢复组
+        if (anyRestored) {
+            for (DishSpecGroup g : allGroups) {
+                if (g.getStatus() != null && g.getStatus() == 1) continue;
+                long activeCount = allOptions.stream()
+                        .filter(o -> o.getGroupId().equals(g.getId()) && o.getStatus() != null && o.getStatus() == 1)
+                        .count();
+                if (activeCount > 0) {
+                    g.setStatus(1);
+                    dishSpecGroupMapper.updateById(g);
+                }
+            }
+        }
+    }
+
+    /**
+     * 菜品下架时，停用其他菜品规格组中关联到该菜品的选项
+     * 匹配规则与 restoreRelatedSpecOptions 一致
+     */
+    private void disableRelatedSpecOptions(Dish dish) {
+        Long dishId = dish.getId();
+        Dish fullDish = dishMapper.selectById(dishId);
+        String dishName = fullDish != null ? fullDish.getName() : dish.getName();
+        if (dishName == null || dishName.trim().isEmpty()) {
+            return;
+        }
+        String dishNameLower = dishName.trim().toLowerCase();
+        String coreName = dishNameLower.replaceAll("(饭|面|粉|汤|粥|套餐)$", "");
+
+        List<DishSpecGroup> allGroups = dishSpecGroupMapper.selectList(null);
+        if (allGroups.isEmpty()) return;
+        List<Long> allGroupIds = allGroups.stream().map(DishSpecGroup::getId).collect(Collectors.toList());
+        List<DishSpecOption> allOptions = dishSpecOptionMapper.selectList(
+                new LambdaQueryWrapper<DishSpecOption>().in(DishSpecOption::getGroupId, allGroupIds));
+
+        boolean anyDisabled = false;
+        for (DishSpecOption opt : allOptions) {
+            if (opt.getStatus() != null && opt.getStatus() == 0) continue; // 已停用的跳过
+            boolean matched = false;
+            if (opt.getDishId() != null && opt.getDishId().equals(dishId)) {
+                matched = true;
+            }
+            if (!matched && opt.getName() != null) {
+                String optName = opt.getName().toLowerCase();
+                if (optName.contains(dishNameLower)) {
+                    matched = true;
+                } else if (!coreName.isEmpty() && coreName.endsWith(optName)) {
+                    matched = true;
+                }
+            }
+            if (matched) {
+                opt.setStatus(0);
+                dishSpecOptionMapper.updateById(opt);
+                anyDisabled = true;
+            }
+        }
+
+        // 规格组状态联动：组内无启用选项时，停用规格组
+        if (anyDisabled) {
+            for (DishSpecGroup g : allGroups) {
+                if (g.getStatus() != null && g.getStatus() == 0) continue;
+                long activeCount = allOptions.stream()
+                        .filter(o -> o.getGroupId().equals(g.getId()) && o.getStatus() != null && o.getStatus() == 1)
+                        .count();
+                if (activeCount == 0) {
+                    g.setStatus(0);
+                    dishSpecGroupMapper.updateById(g);
+                }
+            }
+        }
+    }
+
+    /**
+     * 批量更新规格选项状态（单独操作，不影响菜品状态）
+     * 同时联动规格组状态：启用选项时恢复组，停用选项且组内无启用选项时停用组
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateSpecOptionsStatus(List<Long> ids, Integer status) {
+        if (ids == null || ids.isEmpty()) return;
+        // 更新选项状态
+        dishSpecOptionMapper.update(null,
+                new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<DishSpecOption>()
+                        .in(DishSpecOption::getId, ids)
+                        .set(DishSpecOption::getStatus, status));
+        // 联动规格组状态
+        List<DishSpecOption> updated = dishSpecOptionMapper.selectList(
+                new LambdaQueryWrapper<DishSpecOption>().in(DishSpecOption::getId, ids));
+        if (updated.isEmpty()) return;
+        List<Long> groupIds = updated.stream().map(DishSpecOption::getGroupId).distinct().collect(Collectors.toList());
+        for (Long gid : groupIds) {
+            long activeCount = dishSpecOptionMapper.selectCount(
+                    new LambdaQueryWrapper<DishSpecOption>()
+                            .eq(DishSpecOption::getGroupId, gid)
+                            .eq(DishSpecOption::getStatus, 1));
+            DishSpecGroup g = dishSpecGroupMapper.selectById(gid);
+            if (g == null) continue;
+            if (status == 1 && activeCount > 0 && g.getStatus() == 0) {
+                g.setStatus(1);
+                dishSpecGroupMapper.updateById(g);
+            } else if (status == 0 && activeCount == 0 && g.getStatus() == 1) {
+                g.setStatus(0);
+                dishSpecGroupMapper.updateById(g);
+            }
+        }
     }
 
     /**
@@ -171,8 +338,19 @@ public class ShopAdminServiceImpl implements ShopAdminService {
     public DiningTable saveTable(DiningTable table) {
         if (table.getId() == null) {
             if (table.getQrCode() == null || table.getQrCode().isEmpty()) {
-                // 自动生成二维码标识
-                table.setQrCode("T" + UUID.randomUUID().toString().replace("-", "").substring(0, 16));
+                // 自动生成顺序桌码：T001、T002……
+                List<DiningTable> all = diningTableMapper.selectList(null);
+                int maxNum = 0;
+                for (DiningTable t : all) {
+                    String code = t.getQrCode();
+                    if (code != null && code.startsWith("T")) {
+                        try {
+                            int num = Integer.parseInt(code.substring(1));
+                            if (num > maxNum) maxNum = num;
+                        } catch (NumberFormatException ignored) {}
+                    }
+                }
+                table.setQrCode(String.format("T%03d", maxNum + 1));
             }
             if (table.getStatus() == null) {
                 table.setStatus(1);

@@ -20,6 +20,8 @@ Page({
     selectedIds: [],
     loading: true,
     running: false,
+    allSelected: false,
+    selectedSpecIds: [],
     // ===== 视图预计算（WXML 不能调用 js 方法） =====
     matchedList: [],   // 命中菜品（每项带 selected、cateName）
     relatedList: [],   // 关联规格项变更 [{dish, matches:[{group, option}]}]
@@ -52,7 +54,9 @@ Page({
       mode: e.currentTarget.dataset.mode,
       keyword: '',
       categoryId: null,
-      selectedIds: []
+      selectedIds: [],
+      selectedSpecIds: [],
+      allSelected: false
     });
     this.refreshView();
   },
@@ -65,7 +69,7 @@ Page({
 
   switchCate(e) {
     const id = e.currentTarget.dataset.id;
-    this.setData({ categoryId: (id === null || id === undefined || id === 'null') ? null : id });
+    this.setData({ categoryId: (id === null || id === undefined || id === 'null' || id === 'all') ? null : id });
     this.pruneSelected();
     this.refreshView();
   },
@@ -113,13 +117,98 @@ Page({
     const id = e.currentTarget.dataset.id;
     const selectedIds = this.data.selectedIds.slice();
     const idx = selectedIds.indexOf(id);
+    let selectedSpecIds = this.data.selectedSpecIds.slice();
     if (idx >= 0) {
       selectedIds.splice(idx, 1);
+      // 取消勾选菜品：移除该菜品关联的规格项勾选
+      if (this.data.mode === 'up') {
+        const relatedOptIds = this.getRelatedSpecIds([id]);
+        selectedSpecIds = selectedSpecIds.filter(x => relatedOptIds.indexOf(x) < 0);
+      }
     } else {
       selectedIds.push(id);
+      // 勾选菜品：自动勾选该菜品关联的已停用规格项
+      if (this.data.mode === 'up') {
+        const relatedOptIds = this.getRelatedSpecIds([id]);
+        relatedOptIds.forEach(oid => {
+          if (selectedSpecIds.indexOf(oid) < 0) selectedSpecIds.push(oid);
+        });
+      }
     }
-    this.setData({ selectedIds });
+    this.setData({ selectedIds, selectedSpecIds });
     this.refreshView();
+  },
+
+  /** 获取与指定菜品关联的所有已停用规格项ID */
+  getRelatedSpecIds(dishIds) {
+    const dishNames = this.data.dishes
+      .filter(d => dishIds.indexOf(d.id) >= 0)
+      .map(d => (d.name || '').trim())
+      .filter(Boolean);
+    const ids = [];
+    this.data.dishes.forEach(parent => {
+      (parent.specs || []).forEach(g => {
+        (g.options || []).forEach(o => {
+          if (o.status === 0 && this.specMatches(o, dishIds, dishNames)) {
+            ids.push(o.id);
+          }
+        });
+      });
+    });
+    return ids;
+  },
+
+  /** 全选/取消全选（当前筛选结果） */
+  toggleSelectAll() {
+    if (this.data.allSelected) {
+      this.setData({ selectedIds: [], selectedSpecIds: [], allSelected: false });
+    } else {
+      const ids = this.data.matchedList.map(d => d.id);
+      let selectedSpecIds = this.data.selectedSpecIds.slice();
+      if (this.data.mode === 'up') {
+        const relatedOptIds = this.getRelatedSpecIds(ids);
+        relatedOptIds.forEach(oid => {
+          if (selectedSpecIds.indexOf(oid) < 0) selectedSpecIds.push(oid);
+        });
+      }
+      this.setData({ selectedIds: ids, selectedSpecIds, allSelected: true });
+    }
+    this.refreshView();
+  },
+
+  /** 勾选/取消单个规格项 */
+  toggleSpec(e) {
+    const optId = e.currentTarget.dataset.optId;
+    const selectedSpecIds = this.data.selectedSpecIds.slice();
+    const idx = selectedSpecIds.indexOf(optId);
+    if (idx >= 0) {
+      selectedSpecIds.splice(idx, 1);
+    } else {
+      selectedSpecIds.push(optId);
+    }
+    this.setData({ selectedSpecIds });
+    this.refreshView();
+  },
+
+  /** 仅恢复选中的规格项（不上架菜品） */
+  async restoreSelectedSpecs() {
+    if (this.data.running) return;
+    if (this.data.selectedSpecIds.length === 0) {
+      wx.showToast({ title: '请先勾选要恢复的规格项', icon: 'none' });
+      return;
+    }
+    this.setData({ running: true });
+    try {
+      await api.updateSpecOptionsStatus(this.data.selectedSpecIds, 1);
+      wx.showToast({ title: '已恢复 ' + this.data.selectedSpecIds.length + ' 项规格', icon: 'success' });
+      this.setData({ selectedSpecIds: [] });
+      await this.loadData();
+    } catch (err) {
+      console.error('恢复规格失败:', err);
+      wx.showToast({ title: err.message || '恢复失败', icon: 'none', duration: 3000 });
+    } finally {
+      this.setData({ running: false });
+    }
   },
 
   /** 筛选变化后，移除已不在命中列表中的选中项 */
@@ -139,9 +228,18 @@ Page({
       cateName: this.cateName(d.categoryId)
     }));
     const relatedList = this.relatedChanges();
+    // 给规格项打 selected 标记
+    const selSpecIds = this.data.selectedSpecIds;
+    relatedList.forEach(ch => {
+      ch.matches.forEach(m => {
+        m.selected = selSpecIds.indexOf(m.option.id) >= 0;
+      });
+    });
     const specCountNum = this.specCount();
     const actionCountNum = this.actionCount();
-    this.setData({ matchedList, relatedList, specCountNum, actionCountNum });
+    // 更新全选状态：当前筛选结果全部被选中时为 true
+    const allSelected = matchedList.length > 0 && matchedList.every(d => selectedIds.indexOf(d.id) >= 0);
+    this.setData({ matchedList, relatedList, specCountNum, actionCountNum, allSelected });
   },
 
   // ===== 关联规格项计算 =====
@@ -165,10 +263,15 @@ Page({
     return linked || named;
   },
 
-  /** 关联规格项变更列表：[{dish, matches:[{group, option}]}] */
+  /** 关联规格项变更列表：[{dish, matches:[{group, option}]}]
+   *  下架模式：只显示勾选菜品关联的、当前启用的规格项
+   *  上架模式：显示所有已停用的规格项（不依赖勾选菜品，可独立恢复）
+   */
   relatedChanges() {
+    const isUp = this.data.mode === 'up';
     const selectedIds = this.data.selectedIds;
-    if (!selectedIds.length) return [];
+    // 下架模式：未勾选菜品时不显示
+    if (!isUp && !selectedIds.length) return [];
     const selectedNames = this.data.dishes
       .filter(d => selectedIds.indexOf(d.id) >= 0)
       .map(d => (d.name || '').trim())
@@ -179,13 +282,25 @@ Page({
       const matches = [];
       (parent.specs || []).forEach(g => {
         (g.options || []).forEach(o => {
-          if (this.specMatches(o, selectedIds, selectedNames) && o.status === currentStatus) {
-            matches.push({ group: g, option: o });
+          if (isUp) {
+            // 上架模式：显示所有已停用的规格项
+            if (o.status === 0) {
+              matches.push({ group: g, option: o });
+            }
+          } else {
+            // 下架模式：只显示勾选菜品关联的、当前启用的规格项
+            if (this.specMatches(o, selectedIds, selectedNames) && o.status === currentStatus) {
+              matches.push({ group: g, option: o });
+            }
           }
         });
       });
       if (matches.length > 0) {
-        changes.push({ dish: parent, matches });
+        changes.push({
+          dishId: parent.id,
+          dish: parent,
+          matches: matches.map(m => ({ ...m, optId: m.option.id }))
+        });
       }
     });
     return changes;
@@ -202,7 +317,23 @@ Page({
     const currentStatus = this.currentStatus();
     const dishCount = this.data.dishes.filter(d =>
       selectedIds.indexOf(d.id) >= 0 && d.status === currentStatus).length;
-    const specCount = this.specCount();
+    // 上架模式下，一键上架的规格项只算勾选菜品关联的（不算所有已停用的）
+    let specCount = 0;
+    if (this.data.mode === 'down' || selectedIds.length > 0) {
+      const selectedNames = this.data.dishes
+        .filter(d => selectedIds.indexOf(d.id) >= 0)
+        .map(d => (d.name || '').trim())
+        .filter(Boolean);
+      this.data.dishes.forEach(parent => {
+        (parent.specs || []).forEach(g => {
+          (g.options || []).forEach(o => {
+            if (this.specMatches(o, selectedIds, selectedNames) && o.status === currentStatus) {
+              specCount += 1;
+            }
+          });
+        });
+      });
+    }
     let categoryCount = 0;
     if (this.data.mode === 'up' && dishCount > 0) {
       const categoryIds = new Set(
@@ -279,40 +410,10 @@ Page({
       }
     }
 
-    // 2. 下架/上架选中的菜品
+    // 2. 下架/上架选中的菜品（后端会自动联动处理关联规格项）
     for (const d of this.data.dishes) {
       if (selectedIds.indexOf(d.id) >= 0 && d.status === currentStatus) {
         await api.saveDish({ id: d.id, status: nextStatus });
-      }
-    }
-
-    // 3. 处理关联规格项（含规格组状态联动）
-    for (const change of changes) {
-      const specs = JSON.parse(JSON.stringify(change.dish.specs || []));
-      let dirty = false;
-      for (const g of specs) {
-        let activeOptionCount = 0;
-        for (const o of (g.options || [])) {
-          const hit = change.matches.some(m => m.option.id === o.id);
-          if (hit && o.status === currentStatus) {
-            o.status = nextStatus;
-            dirty = true;
-          }
-          if (o.status === 1) activeOptionCount += 1;
-        }
-        // 组状态联动：下架时组内无启用选项→停用组；上架时组有启用选项→恢复组
-        if (isUp && g.options && g.options.length > 0 && activeOptionCount > 0 && g.status === 0) {
-          g.status = 1;
-          dirty = true;
-        } else if (!isUp && g.options && g.options.length > 0 && activeOptionCount === 0 && g.status === 1) {
-          g.status = 0;
-          dirty = true;
-        }
-      }
-      if (dirty) {
-        // 被估清/上架的菜品自己，status 用操作后的新值，避免覆盖第2步的状态变更
-        const dishStatus = selectedIds.indexOf(change.dish.id) >= 0 ? nextStatus : change.dish.status;
-        await api.saveDish({ id: change.dish.id, shopId, status: dishStatus, specs });
       }
     }
   }

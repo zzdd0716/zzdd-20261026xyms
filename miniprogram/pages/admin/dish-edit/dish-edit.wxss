@@ -81,3 +81,11 @@
   box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.05);
 }
 .save-btn { width: 100%; }
+
+.image-upload-area { width: 200rpx; height: 200rpx; position: relative; }
+.preview-wrap { position: relative; width: 200rpx; height: 200rpx; }
+.image-upload-btn { width: 200rpx; height: 200rpx; border: 2rpx dashed #d0d0d0; border-radius: 12rpx; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fafafa; }
+.upload-icon { font-size: 56rpx; color: #c0c0c0; line-height: 1; }
+.upload-text { font-size: 24rpx; color: #909399; margin-top: 8rpx; }
+.dish-preview { width: 200rpx; height: 200rpx; border-radius: 12rpx; }
+.image-remove { position: absolute; top: -12rpx; right: -12rpx; width: 40rpx; height: 40rpx; border-radius: 50%; background: rgba(0,0,0,0.65); color: #fff; font-size: 22rpx; display: flex; align-items: center; justify-content: center; z-index: 2; }

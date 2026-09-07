@@ -10,31 +10,40 @@ App({
     tableNo: '',
     // 当前用户（openid 换取的数据库 userId）
     userId: null,
+    // 是否管理员（只有管理员能进商家后台）
+    isAdmin: false,
     // 本地持久 openid（首次启动生成，用于"我的订单"区分用户）
-    openid: ''
+    openid: '',
+    // 用户昵称和头像
+    nickname: '',
+    avatar: ''
   },
 
   onLaunch() {
-    // 1. 确保本地 openid 唯一持久
-    let openid = wx.getStorageSync('wx_openid');
-    if (!openid) {
-      openid = 'wx_' + uuid();
-      wx.setStorageSync('wx_openid', openid);
-    }
-    this.globalData.openid = openid;
-
-    // 2. 登录：openid 换 userId（后端自动注册，幂等）
+    // 登录：wx.login 获取 code，后端用 code 换真实 openid
     this.login();
   },
 
   login() {
-    const openid = this.globalData.openid;
-    if (!openid) return;
-    api.login(openid).then(userId => {
-      this.globalData.userId = userId;
-    }).catch(() => {
-      // 后端未启动时静默失败，下单/查单时会再提示
-      console.warn('登录失败：请确认后端服务已启动');
+    wx.login({
+      success: (res) => {
+        if (!res.code) {
+          console.warn('wx.login 获取 code 失败');
+          return;
+        }
+        api.login(res.code).then(user => {
+          this.globalData.userId = user.id;
+          this.globalData.isAdmin = user.isAdmin === 1;
+          this.globalData.openid = user.openid || '';
+          this.globalData.nickname = user.nickname || '';
+          this.globalData.avatar = user.avatar || '';
+        }).catch(() => {
+          console.warn('登录失败：请确认后端服务已启动');
+        });
+      },
+      fail: () => {
+        console.warn('wx.login 失败');
+      }
     });
   },
 
@@ -43,9 +52,21 @@ App({
     if (this.globalData.userId) {
       return Promise.resolve(this.globalData.userId);
     }
-    return api.login(this.globalData.openid).then(userId => {
-      this.globalData.userId = userId;
-      return userId;
+    return new Promise((resolve, reject) => {
+      wx.login({
+        success: (res) => {
+          if (!res.code) { reject(new Error('wx.login失败')); return; }
+          api.login(res.code).then(user => {
+            this.globalData.userId = user.id;
+            this.globalData.isAdmin = user.isAdmin === 1;
+            this.globalData.openid = user.openid || '';
+            this.globalData.nickname = user.nickname || '';
+            this.globalData.avatar = user.avatar || '';
+            resolve(user.id);
+          }).catch(reject);
+        },
+        fail: reject
+      });
     });
   },
 

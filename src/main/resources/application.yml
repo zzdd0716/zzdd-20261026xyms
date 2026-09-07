@@ -1,5 +1,9 @@
 server:
   port: 8080
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
 spring:
   application:
@@ -17,6 +21,10 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: auto
+
+wechat:
+  appid: wx76c9ed9fd79a7c4d
+  secret: 7838f892f16e8893722cd0d21809313c
 
 logging:
   level:

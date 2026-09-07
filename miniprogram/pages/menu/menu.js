@@ -195,6 +195,18 @@ Page({
     }
   },
 
+  /** 购物车明细：修改备注 */
+  onCartRemarkInput(e) {
+    const key = e.currentTarget.dataset.key;
+    const value = e.detail.value;
+    const cart = app.getCart();
+    if (cart[key]) {
+      cart[key].remark = value;
+      app.saveCart(cart);
+      this.refreshCart();
+    }
+  },
+
   /** 清空购物车 */
   clearCart() {
     wx.showModal({
