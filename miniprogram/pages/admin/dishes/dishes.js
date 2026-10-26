@@ -34,6 +34,13 @@ Page({
       api.adminCategories(shopId),
       api.adminDishes(shopId)
     ]).then(([cats, dishes]) => {
+      // 处理图片URL：相对路径自动拼接BASE_URL
+      const { BASE_URL } = require('../../../utils/config');
+      (dishes || []).forEach(d => {
+        if (d.image && d.image.startsWith('/')) {
+          d.image = BASE_URL + d.image;
+        }
+      });
       const patch = { categories: cats, dishes: dishes || [], loading: false };
       if (cats.length && this.data.activeCate === null) {
         patch.activeCate = cats[0].id;

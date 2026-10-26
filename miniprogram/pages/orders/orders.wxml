@@ -1,4 +1,4 @@
-﻿<wxs module="fmt">
+<wxs module="fmt">
 module.exports = function (n) {
   var v = n * 1;
   if (v !== v) return '0.00';
@@ -22,7 +22,7 @@ module.exports = function (n) {
         <text class="order-no">单号 {{item.orderNo}}</text>
         <text class="tag {{item.statusTag}}">{{item.statusText}}</text>
       </view>
-      <view class="order-meta">桌号 {{item.tableId || '-'}} · {{item.createTime || ''}}</view>
+      <view class="order-meta">桌号 {{item.tableNoText}} · {{item.createTime || ''}}</view>
       <view class="order-foot">
         <text class="order-view">查看详情 ›</text>
         <text class="order-amount">¥{{fmt(item.totalAmount)}}</text>

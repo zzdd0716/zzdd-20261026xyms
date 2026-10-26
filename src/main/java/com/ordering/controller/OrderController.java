@@ -87,23 +87,31 @@ public class OrderController {
         return Result.success();
     }
 
-    /** 收银统计：按日/周/月/季度汇总入账 */
+    /** 收银统计：按日/周/月/季度汇总入账，或按自定义时间段 */
     @GetMapping("/cashier")
-    @Operation(summary = "收银统计", description = "按日/周/月/季度汇总订单入账金额与单数（排除已取消/已退款）")
+    @Operation(summary = "收银统计", description = "按日/周/月/季度汇总订单入账金额与单数（排除已取消/已退款），传startDate/endDate则按自定义时间段")
     public Result<CashierSummaryDTO> cashier(
             @Parameter(description = "周期：day 按天 / week 按周 / month 按月 / quarter 按季度（默认 day）", example = "day")
-            @RequestParam(defaultValue = "day") String period) {
-        return Result.success(orderService.cashierSummary(period));
+            @RequestParam(defaultValue = "day") String period,
+            @Parameter(description = "自定义开始日期 yyyy-MM-dd（可选，传了则忽略period）", example = "2026-09-01")
+            @RequestParam(required = false) String startDate,
+            @Parameter(description = "自定义结束日期 yyyy-MM-dd（可选）", example = "2026-09-10")
+            @RequestParam(required = false) String endDate) {
+        return Result.success(orderService.cashierSummary(period, startDate, endDate));
     }
 
     /** 菜品销量统计（扇形图数据）：前N名 + 其余合并为"其他" */
     @GetMapping("/sales")
-    @Operation(summary = "菜品销量统计", description = "统计当前周期内各菜品销量，返回前N名，其余合并为“其他”")
+    @Operation(summary = "菜品销量统计", description = "统计当前周期内各菜品销量，返回前N名，其余合并为“其他”，传startDate/endDate则按自定义时间段")
     public Result<SalesSummaryDTO> sales(
             @Parameter(description = "周期：day/week/month/quarter（默认 day）", example = "day")
             @RequestParam(defaultValue = "day") String period,
             @Parameter(description = "榜单前N名，其余合并为其他（默认5）", example = "5")
-            @RequestParam(defaultValue = "5") Integer limit) {
-        return Result.success(orderService.salesSummary(period, limit));
+            @RequestParam(defaultValue = "5") Integer limit,
+            @Parameter(description = "自定义开始日期 yyyy-MM-dd（可选）", example = "2026-09-01")
+            @RequestParam(required = false) String startDate,
+            @Parameter(description = "自定义结束日期 yyyy-MM-dd（可选）", example = "2026-09-10")
+            @RequestParam(required = false) String endDate) {
+        return Result.success(orderService.salesSummary(period, limit, startDate, endDate));
     }
 }

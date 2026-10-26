@@ -1,4 +1,4 @@
-﻿<wxs module="fmt">
+<wxs module="fmt">
 module.exports = function (n) {
   var v = n * 1;
   if (v !== v) return '0.00';
@@ -19,7 +19,7 @@ module.exports = function (n) {
       <text class="tag {{statusTag}}" style="font-size:28rpx;padding:8rpx 24rpx;">{{statusText}}</text>
     </view>
     <view class="meta">单号：{{order.orderNo}}</view>
-    <view class="meta">桌号：{{order.tableId || '-'}}</view>
+    <view class="meta">桌号：{{order.tableNoText}}</view>
     <view class="meta">下单时间：{{order.createTime || ''}}</view>
     <view wx:if="{{order.remark}}" class="meta">备注：{{order.remark}}</view>
   </view>

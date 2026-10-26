@@ -1,0 +1,61 @@
+.page { min-height: 100vh; background: #f5f6f8; padding: 24rpx 24rpx 40rpx; }
+
+.qr-card { padding: 32rpx 28rpx; }
+.qr-title { font-size: 32rpx; font-weight: 700; color: #303133; margin-bottom: 24rpx; }
+
+.qr-box {
+  background: #fff;
+  border: 2rpx dashed #e4e6eb;
+  border-radius: 20rpx;
+  padding: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 480rpx;
+}
+.qr-img { width: 420rpx; height: 420rpx; }
+.qr-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #b0b3ba;
+  font-size: 26rpx;
+}
+.qr-empty-icon { font-size: 72rpx; margin-bottom: 16rpx; }
+
+.qr-tip {
+  margin-top: 24rpx;
+  font-size: 24rpx;
+  color: #909399;
+  line-height: 1.6;
+  background: #fff7f2;
+  border-radius: 12rpx;
+  padding: 16rpx 20rpx;
+}
+
+/* 版本切换 */
+.env-row {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 28rpx;
+}
+.env-item {
+  flex: 1;
+  text-align: center;
+  font-size: 26rpx;
+  color: #606266;
+  background: #f1f2f4;
+  border-radius: 40rpx;
+  padding: 16rpx 0;
+  border: 2rpx solid transparent;
+}
+.env-item.active {
+  color: #ff6b2c;
+  background: #fff0e8;
+  border-color: #ff6b2c;
+  font-weight: 600;
+}
+
+.save-btn { margin-top: 28rpx; width: 100%; }
+
+.tip { margin: 32rpx 8rpx 0; font-size: 22rpx; color: #b0b3ba; text-align: center; line-height: 1.7; }

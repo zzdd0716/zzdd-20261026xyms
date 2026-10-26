@@ -24,11 +24,12 @@ module.exports = function (n) {
         <view class="spec-group-head">
           <text class="spec-group-name">{{g.name}}</text>
           <text class="spec-group-rule required" wx:if="{{g.required === 1 && g.type !== 3}}">必选</text>
-          <text class="spec-group-rule" wx:else>可选</text>
+          <text class="spec-group-rule" wx:elif="{{!g.locked}}">可选</text>
+          <text class="spec-group-rule locked" wx:if="{{g.locked}}">🔒 自提打包 · 不可修改</text>
         </view>
         <view class="spec-options">
           <view
-            class="spec-option {{o.selected ? 'active' : ''}}"
+            class="spec-option {{o.selected ? 'active' : ''}} {{g.locked ? 'locked' : ''}}"
             wx:for="{{g.options}}"
             wx:key="id"
             wx:for-item="o"

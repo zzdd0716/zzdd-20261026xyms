@@ -8,6 +8,8 @@ App({
     shopId: 1,
     tableId: null,
     tableNo: '',
+    // 进入模式：null=堂食（扫码进桌台） pickup=自提码进入（默认打包且不可更改）
+    entryMode: null,
     // 当前用户（openid 换取的数据库 userId）
     userId: null,
     // 是否管理员（只有管理员能进商家后台）

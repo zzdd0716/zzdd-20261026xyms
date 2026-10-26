@@ -44,9 +44,6 @@ public class Dish {
     /** 累计销量 */
     private Integer soldCount;
 
-    /** 是否推荐：1推荐 0普通 */
-    private Integer isRecommend;
-
     /** 状态：1上架 0下架 */
     private Integer status;
 

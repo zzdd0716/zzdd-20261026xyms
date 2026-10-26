@@ -4,12 +4,13 @@
  */
 const config = require('./config');
 
-function request(url, method = 'GET', data = {}) {
+function request(url, method = 'GET', data = {}, timeout = 10000) {
   return new Promise((resolve, reject) => {
     wx.request({
       url: config.BASE_URL + url,
       method,
       data,
+      timeout: timeout,
       header: { 'Content-Type': 'application/json' },
       success(res) {
         if (res.statusCode !== 200) {
@@ -139,13 +140,65 @@ const api = {
   },
 
   // ================= 商家：收银统计 =================
-  /** 按日/周/月/季汇总入账 */
-  cashierSummary(period) {
-    return get('/api/order/cashier?period=' + (period || 'day'));
+  /** 按日/周/月/季汇总入账，支持自定义时间段 */
+  cashierSummary(period, startDate, endDate) {
+    let url = '/api/order/cashier?period=' + (period || 'day');
+    if (startDate) url += '&startDate=' + startDate;
+    if (endDate) url += '&endDate=' + endDate;
+    return get(url);
   },
-  /** 菜品销量统计（前N名+其他） */
-  salesSummary(period, limit) {
-    return get('/api/order/sales?period=' + (period || 'day') + '&limit=' + (limit || 5));
+  /** 菜品销量统计（前N名+其他），支持自定义时间段 */
+  salesSummary(period, limit, startDate, endDate) {
+    let url = '/api/order/sales?period=' + (period || 'day') + '&limit=' + (limit || 5);
+    if (startDate) url += '&startDate=' + startDate;
+    if (endDate) url += '&endDate=' + endDate;
+    return get(url);
+  },
+
+  // ================= AI 功能 =================
+  /** AI 菜品推荐 */
+  aiRecommend(shopId, preference, excludeIds) {
+    return post('/api/ai/recommend', { shopId, preference, excludeIds: excludeIds || [] });
+  },
+  /** AI 智能客服对话 */
+  aiChat(shopId, message) {
+    return post('/api/ai/chat', { shopId, message });
+  },
+
+  // ================= AI 管理（管理员） =================
+  /** 查AI开关配置 */
+  getAiConfig(shopId) {
+    return get('/api/admin/ai-config?shopId=' + shopId);
+  },
+  /** 修改AI开关 */
+  updateAiConfig(shopId, key, value) {
+    return put('/api/admin/ai-config', { shopId, key, value });
+  },
+
+  // ================= FAQ 知识库管理（管理员） =================
+  /** 查FAQ列表 */
+  getAiQaList(shopId) {
+    return get('/api/admin/ai-qa?shopId=' + shopId);
+  },
+  /** 新增FAQ */
+  addAiQa(data) {
+    return post('/api/admin/ai-qa', data);
+  },
+  /** 修改FAQ */
+  updateAiQa(data) {
+    return put('/api/admin/ai-qa', data);
+  },
+  /** 删除FAQ */
+  deleteAiQa(id) {
+    return del('/api/admin/ai-qa/' + id);
+  },
+  /** AI自动生成FAQ（超时60秒，因为要调大模型） */
+  generateAiQa(shopId) {
+    return request('/api/admin/ai-qa/generate?shopId=' + shopId, 'POST', {}, 60000);
+  },
+  /** AI智能去重（超时60秒） */
+  dedupAiQa(shopId) {
+    return request('/api/admin/ai-qa/deduplicate?shopId=' + shopId, 'POST', {}, 60000);
   }
 };
 

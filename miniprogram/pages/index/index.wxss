@@ -1,7 +1,7 @@
 .page { min-height: 100vh; padding-bottom: 40rpx; }
 
 .hero {
-  background: linear-gradient(135deg, #ff6b2c, #ff9a5c);
+  background: linear-gradient(135deg, #ff9a5c, #ff6b2c);
   padding: 64rpx 40rpx 80rpx;
   text-align: center;
   color: #fff;
@@ -42,6 +42,35 @@
   border-radius: 44rpx;
   padding: 16rpx 0;
 }
+
+/* 自提取餐入口（模拟扫描自提码） */
+.pickup-panel {
+  margin: 24rpx 24rpx 0;
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 28rpx;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+}
+.pickup-panel:active { background: #fff8f3; }
+.pickup-icon {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 18rpx;
+  background: #fff0e8;
+  color: #ff6b2c;
+  font-size: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+.pickup-info { flex: 1; min-width: 0; }
+.pickup-title { font-size: 30rpx; font-weight: 700; color: #303133; }
+.pickup-sub { font-size: 22rpx; color: #909399; margin-top: 6rpx; }
+.pickup-arrow { color: #c0c4cc; font-size: 32rpx; margin-left: 12rpx; }
 
 .page-tip {
   margin: 32rpx 40rpx 0;

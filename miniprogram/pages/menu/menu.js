@@ -28,7 +28,16 @@ Page({
     // 购物车明细弹窗
     cartPopupVisible: false,
     // 桌号
-    tableNo: ''
+    tableNo: '',
+    // 是否自提模式（自提码进入：默认打包不可更改）
+    isPickup: false,
+    // AI 推荐
+    aiDialogVisible: false,
+    aiPreference: '',
+    aiLoading: false,
+    aiResultVisible: false,
+    aiRecommendList: [],
+    aiExcludeIds: []
   },
 
   onLoad() {
@@ -40,7 +49,7 @@ Page({
       this.getTabBar().setData({ selected: 0 });
     }
     // 每次回到本页同步购物车角标、桌号，并刷新菜单（估清下架后及时生效）
-    this.setData({ tableNo: app.globalData.tableNo });
+    this.setData({ tableNo: app.globalData.tableNo, isPickup: app.globalData.entryMode === 'pickup' });
     this.refreshCart();
     this.loadMenu();
   },
@@ -58,6 +67,13 @@ Page({
       api.listCategories(shopId),
       api.listDishes(shopId)
     ]).then(([cats, dishes]) => {
+      // 处理图片URL：相对路径自动拼接BASE_URL
+      const { BASE_URL } = require('../../utils/config');
+      dishes.forEach(d => {
+        if (d.image && d.image.startsWith('/')) {
+          d.image = BASE_URL + d.image;
+        }
+      });
       const patch = { categories: cats, dishes, loading: false };
       if (cats.length && this.data.activeCate === null) {
         patch.activeCate = cats[0].id;
@@ -226,5 +242,69 @@ Page({
   goCheckout() {
     this.setData({ cartPopupVisible: false });
     wx.switchTab({ url: '/pages/cart/cart' });
+  },
+
+  // ==================== AI 推荐 ====================
+
+  /** 打开 AI 弹窗 */
+  openAiDialog() {
+    this.setData({ aiDialogVisible: true, aiResultVisible: false, aiPreference: '' });
+  },
+
+  /** 关闭 AI 弹窗 */
+  closeAiDialog() {
+    this.setData({ aiDialogVisible: false });
+  },
+
+  /** 输入口味偏好 */
+  onAiPreferenceInput(e) {
+    this.setData({ aiPreference: e.detail.value });
+  },
+
+  /** 调 AI 推荐接口 */
+  doAiRecommend() {
+    const shopId = app.globalData.shopId;
+    const preference = this.data.aiPreference || '随便推荐几道招牌菜';
+    this.setData({ aiLoading: true });
+
+    api.aiRecommend(shopId, preference, this.data.aiExcludeIds).then(list => {
+      const { BASE_URL } = require('../../utils/config');
+      list.forEach(d => {
+        if (d.image && d.image.startsWith('/')) {
+          d.image = BASE_URL + d.image;
+        }
+      });
+      // 把这次推荐的菜品ID加入排除列表，下次换一批时避开
+      const newExcludeIds = this.data.aiExcludeIds.concat(list.map(d => d.id));
+      this.setData({
+        aiLoading: false,
+        aiResultVisible: true,
+        aiRecommendList: list,
+        aiExcludeIds: newExcludeIds
+      });
+    }).catch(e => {
+      this.setData({ aiLoading: false });
+      util.toast('AI推荐失败：' + e.message);
+    });
+  },
+
+  /** 换一批：用同样的偏好再调一次，出全新推荐 */
+  refreshAiRecommend() {
+    if (this.data.aiLoading) return; // 正在加载，禁止重复点击
+    this.doAiRecommend();
+  },
+
+  /** 把 AI 推荐的菜加入购物车 */
+  addAiDishToCart(e) {
+    const id = e.currentTarget.dataset.id;
+    const dish = this.data.dishes.find(d => d.id === id);
+    if (!dish) return;
+    // 直接打开规格选择弹窗，和点菜品的"选规格"一样
+    this.setData({ specDish: dish, specVisible: true, aiDialogVisible: false });
+  },
+
+  /** 重置 AI 弹窗，重新输入口味 */
+  resetAiDialog() {
+    this.setData({ aiResultVisible: false, aiPreference: '', aiExcludeIds: [] });
   }
 });

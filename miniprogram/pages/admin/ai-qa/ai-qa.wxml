@@ -1,0 +1,60 @@
+<view class="page">
+  <!-- 顶部操作栏 -->
+  <view class="top-bar">
+    <text class="total">共 {{list.length}} 条{{selectedCount > 0 ? ' · 已选' + selectedCount + '条' : ''}}</text>
+    <view class="top-btns">
+      <view class="gen-btn" bindtap="onGenerate" wx:if="{{!generating}}">✨ AI生成</view>
+      <view class="gen-btn loading" wx:else>生成中…</view>
+      <view class="dedup-btn" bindtap="onDedup" wx:if="{{!deduping}}">🧹 智能去重</view>
+      <view class="dedup-btn loading" wx:else>去重中…</view>
+      <view class="multi-btn {{multiMode ? 'active' : ''}}" bindtap="toggleMulti">{{multiMode ? '取消' : '多选'}}</view>
+      <view class="add-btn" bindtap="openAdd">+ 新增</view>
+    </view>
+  </view>
+
+  <!-- FAQ 列表 -->
+  <view class="qa-card {{multiMode ? 'multi' : ''}}" wx:for="{{list}}" wx:key="id">
+    <!-- 多选模式下的勾选框 -->
+    <view class="checkbox" wx:if="{{multiMode}}" data-id="{{item.id}}" bindtap="toggleSelect">
+      <view class="check-inner {{selectedIds[item.id] ? 'checked' : ''}}">{{selectedIds[item.id] ? '✓' : ''}}</view>
+    </view>
+    <view class="qa-content" data-id="{{item.id}}" data-q="{{item.question}}" data-a="{{item.answer}}" bindtap="openEdit">
+      <view class="qa-q">Q：{{item.question}}</view>
+      <view class="qa-a">A：{{item.answer}}</view>
+    </view>
+    <view class="qa-actions" wx:if="{{!multiMode}}">
+      <text class="action-btn edit" data-id="{{item.id}}" data-q="{{item.question}}" data-a="{{item.answer}}" bindtap="openEdit">编辑</text>
+      <text class="action-btn delete" data-id="{{item.id}}" bindtap="onDelete">删除</text>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{list.length === 0}}">暂无知识库内容，点上方新增</view>
+
+  <!-- 多选模式下底部批量删除栏 -->
+  <view class="bottom-bar" wx:if="{{multiMode}}">
+    <view class="select-all" bindtap="toggleAll">
+      <view class="check-inner {{allChecked ? 'checked' : ''}}">{{allChecked ? '✓' : ''}}</view>
+      <text class="select-all-text">全选</text>
+    </view>
+    <view class="batch-delete {{selectedCount === 0 ? 'disabled' : ''}}" bindtap="onBatchDelete">删除({{selectedCount}})</view>
+  </view>
+
+  <!-- 新增/编辑弹窗 -->
+  <view class="mask" wx:if="{{dialogVisible}}" bindtap="closeDialog">
+    <view class="dialog" catchtap="noop">
+      <view class="dialog-title">{{editId ? '编辑问题' : '新增问题'}}</view>
+      <view class="form-item">
+        <text class="form-label">问题</text>
+        <input class="form-input" placeholder="" value="{{formQuestion}}" bindinput="onQInput" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">答案</text>
+        <textarea class="form-textarea" placeholder="" value="{{formAnswer}}" bindinput="onAInput" />
+      </view>
+      <view class="dialog-btns">
+        <view class="btn cancel" bindtap="closeDialog">取消</view>
+        <view class="btn save" bindtap="onSave">保存</view>
+      </view>
+    </view>
+  </view>
+</view>

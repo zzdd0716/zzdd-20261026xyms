@@ -41,6 +41,7 @@
 .spec-group-name { font-size: 28rpx; font-weight: 600; color: #303133; margin-right: 12rpx; }
 .spec-group-rule { font-size: 20rpx; color: #909399; background: #f1f2f4; border-radius: 8rpx; padding: 2rpx 10rpx; }
 .spec-group-rule.required { color: #ff6b2c; background: #fff0e8; }
+.spec-group-rule.locked { color: #ff6b2c; background: #fff0e8; }
 
 .spec-options {
   display: grid;
@@ -71,6 +72,10 @@
   color: #ff6b2c;
   background: #fff5ef;
 }
+/* 自提锁定：不可更改的打包选项 */
+.spec-option.locked { cursor: default; }
+.spec-option.locked:not(.active) { color: #c0c4cc; border-color: #e4e6eb; background: #fafafa; }
+.spec-option.locked.active { border-color: #ff6b2c; color: #ff6b2c; background: #fff0e8; }
 .opt-delta { color: #ff6b2c; font-size: 22rpx; margin-left: 6rpx; flex-shrink: 0; }
 
 .spec-remark-row { padding: 16rpx 0 28rpx; }

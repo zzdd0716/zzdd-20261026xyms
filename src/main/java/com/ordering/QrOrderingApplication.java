@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * @author qr-ordering
  */
 @SpringBootApplication
-@MapperScan("com.ordering.mapper")
+@MapperScan({"com.ordering.mapper", "com.ordering.ai.mapper"})
 @EnableScheduling
 public class QrOrderingApplication {
 

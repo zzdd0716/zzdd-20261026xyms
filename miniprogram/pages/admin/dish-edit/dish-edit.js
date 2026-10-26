@@ -61,6 +61,11 @@ Page({
         util.toast('未找到该菜品');
         return;
       }
+      // 图片URL：相对路径拼接BASE_URL用于显示
+      let img = d.image || '';
+      if (img && img.startsWith('/')) {
+        img = config.BASE_URL + img;
+      }
       this.setData({
         form: {
           id: d.id,
@@ -69,7 +74,7 @@ Page({
           price: d.price != null ? String(d.price) : '',
           stock: d.stock != null ? String(d.stock) : '0',
           status: d.status != null ? d.status : 1,
-          image: d.image || '',
+          image: img,
           description: d.description || '',
           specs: (d.specs || []).map(g => ({
             id: g.id,
@@ -129,7 +134,8 @@ Page({
             try {
               const data = JSON.parse(uploadRes.data);
               if (data.code === 200) {
-                this.setData({ 'form.image': config.BASE_URL + data.url });
+                // 只保存相对路径，显示时再拼接BASE_URL，避免cpolar地址变化导致图片失效
+                this.setData({ 'form.image': data.url });
                 util.toast('上传成功', 'success');
               } else {
                 util.toast('上传失败：' + (data.message || ''));
@@ -263,6 +269,11 @@ Page({
     }
 
     this.setData({ saving: true });
+    // 图片URL：保存时转回相对路径，去掉BASE_URL前缀
+    let saveImage = f.image || '';
+    if (saveImage.startsWith(config.BASE_URL)) {
+      saveImage = saveImage.substring(config.BASE_URL.length);
+    }
     const payload = {
       id: f.id || undefined,
       shopId: app.globalData.shopId,
@@ -272,7 +283,7 @@ Page({
       stock: Number(f.stock) || 0,
       // 库存大于0自动上架，库存为0自动下架
       status: (Number(f.stock) || 0) > 0 ? 1 : 0,
-      image: f.image,
+      image: saveImage,
       description: f.description,
       specs: f.specs.map(g => ({
         name: g.name,

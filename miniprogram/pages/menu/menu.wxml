@@ -21,8 +21,15 @@ module.exports = function (n) {
         <image class="shop-logo" src="/images/logo.png" mode="aspectFill"></image>
         <text>禧粤美食</text>
       </view>
-      <view class="shop-meta" wx:if="{{tableNo}}">桌号：{{tableNo}} · 选好菜加入购物车</view>
+      <view class="shop-meta" wx:if="{{isPickup}}">自提打包 · 选好菜加入购物车</view>
+      <view class="shop-meta" wx:elif="{{tableNo}}">桌号：{{tableNo}} · 选好菜加入购物车</view>
     </view>
+  </view>
+
+  <!-- 自提模式提示（自提码进入：默认打包且不可更改） -->
+  <view class="pickup-banner" wx:if="{{isPickup}}">
+    <text class="pickup-banner-icon">🥡</text>
+    <text class="pickup-banner-text">自提取餐 · 所有菜品默认打包，规格中的堂食/打包不可修改</text>
   </view>
 
   <!-- 搜索栏 -->
@@ -36,6 +43,13 @@ module.exports = function (n) {
         bindinput="onKeywordInput" />
       <view class="search-clear" wx:if="{{keyword}}" bindtap="clearKeyword">✕</view>
     </view>
+  </view>
+
+  <!-- AI 推荐入口 -->
+  <view class="ai-banner" bindtap="openAiDialog">
+    <text class="ai-banner-icon">🤖</text>
+    <text class="ai-banner-text">不知道吃什么？AI帮你推荐</text>
+    <text class="ai-banner-arrow">›</text>
   </view>
 
   <!-- 分类 + 菜品 左右两栏 -->
@@ -113,6 +127,50 @@ module.exports = function (n) {
       <view class="cart-popup-foot">
         <view class="cart-popup-total">合计 <text class="money">¥{{fmt(cartTotal)}}</text></view>
         <view class="cart-popup-checkout" bindtap="goCheckout">去结算</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- AI 推荐弹窗 -->
+  <view class="ai-mask" wx:if="{{aiDialogVisible}}" bindtap="closeAiDialog">
+    <view class="ai-dialog" catchtap="noop">
+      <view class="ai-dialog-head">
+        <text class="ai-dialog-title">🤖 AI 帮你点</text>
+        <text class="ai-dialog-close" bindtap="closeAiDialog">✕</text>
+      </view>
+
+      <!-- 输入口味偏好 -->
+      <view class="ai-input-area" wx:if="{{!aiResultVisible}}">
+        <input
+          class="ai-input"
+          placeholder="说说你想吃什么口味？如：清淡的、不要辣"
+          value="{{aiPreference}}"
+          bindinput="onAiPreferenceInput"
+          confirm-type="search"
+          bindconfirm="doAiRecommend" />
+        <view class="ai-submit-btn {{aiLoading ? 'disabled' : ''}}" bindtap="doAiRecommend">
+          {{aiLoading ? 'AI 思考中…' : '开始推荐'}}
+        </view>
+      </view>
+
+      <!-- 推荐结果 -->
+      <view class="ai-result-area" wx:if="{{aiResultVisible}}">
+        <view class="ai-result-title">为你推荐这几道：</view>
+        <scroll-view scroll-y class="ai-result-list">
+          <view class="ai-result-item" wx:for="{{aiRecommendList}}" wx:key="id">
+            <view class="ai-result-info">
+              <view class="ai-result-name">{{item.name}}</view>
+              <view class="ai-result-price">¥{{fmt(item.price)}}</view>
+            </view>
+            <view class="ai-result-add" data-id="{{item.id}}" bindtap="addAiDishToCart">选它</view>
+          </view>
+        </scroll-view>
+        <view class="ai-result-actions">
+          <view class="ai-refresh-btn {{aiLoading ? 'disabled' : ''}}" bindtap="refreshAiRecommend">
+            {{aiLoading ? 'AI思考中…' : '换一换'}}
+          </view>
+          <view class="ai-reset-btn" bindtap="resetAiDialog">重新输入</view>
+        </view>
       </view>
     </view>
   </view>

@@ -62,7 +62,7 @@ public class ShopAdminController {
     }
 
     @PostMapping("/dish")
-    @Operation(summary = "新增/修改菜品", description = "带 id 为修改，不带 id 为新增；字段：name(必填)、price(必填)、categoryId、stock、isRecommend、status")
+    @Operation(summary = "新增/修改菜品", description = "带 id 为修改，不带 id 为新增；字段：name(必填)、price(必填)、categoryId、stock、status")
     public Result<Dish> saveDish(@RequestBody Dish dish) {
         return Result.success(shopAdminService.saveDish(dish));
     }
@@ -109,6 +109,24 @@ public class ShopAdminController {
         byte[] image = wechatService.getWxacode(String.valueOf(tableId), "pages/index/index");
         response.setContentType("image/jpeg");
         response.setHeader("Content-Disposition", "inline; filename=table_" + tableId + ".jpg");
+        response.getOutputStream().write(image);
+        response.getOutputStream().flush();
+    }
+
+    // ===== 自提码 =====
+    // 自提码缓存（key=env, value=图片字节）—— 同一版本码完全相同，避免每次调用微信接口（3-8秒）
+    private static final java.util.Map<String, byte[]> pickupQrCache = new java.util.concurrent.ConcurrentHashMap<>();
+
+    @GetMapping("/pickup/qrcode")
+    @Operation(summary = "自提码小程序码", description = "生成自提码微信小程序码，扫码进入自提模式（菜品默认打包、不可更改）；env 可选 release正式/trial体验/develop开发")
+    public void pickupQrcode(
+            @Parameter(description = "小程序版本：release 正式 / trial 体验 / develop 开发（默认 release）", example = "release")
+            @RequestParam(defaultValue = "release") String env,
+            HttpServletResponse response) throws IOException {
+        byte[] image = pickupQrCache.computeIfAbsent(env, k ->
+                wechatService.getWxacodeUnlimit("type=pickup", "pages/index/index", k));
+        response.setContentType("image/jpeg");
+        response.setHeader("Content-Disposition", "inline; filename=pickup_qrcode.jpg");
         response.getOutputStream().write(image);
         response.getOutputStream().flush();
     }

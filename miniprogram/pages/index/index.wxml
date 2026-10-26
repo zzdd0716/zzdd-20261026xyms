@@ -29,5 +29,14 @@
     </view>
   </view>
 
+  <!-- 自提取餐：模拟扫描"自提码"进入（正式环境由自提码 scene=type=pickup 自动进入） -->
+  <view class="pickup-panel" bindtap="enterPickup">
+    <view class="pickup-icon">🥡</view>
+    <view class="pickup-info">
+      <view class="pickup-title">自提取餐</view>
+    </view>
+    <view class="pickup-arrow">›</view>
+  </view>
+
   <view class="page-tip">提示：正式上线后，顾客扫描桌上二维码即可自动识别桌号，无需手动选择</view>
 </view>

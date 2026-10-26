@@ -1,4 +1,4 @@
-﻿<wxs module="fmt">
+<wxs module="fmt">
 module.exports = function (n) {
   var v = n * 1;
   if (v !== v) return '0.00';
@@ -14,8 +14,14 @@ module.exports = function (n) {
 </wxs>
 
 <view class="page">
+  <!-- 自提模式提示 -->
+  <view class="pickup-bar" wx:if="{{isPickup}}">
+    <text class="pickup-bar-icon">🥡</text>
+    <text class="pickup-bar-text">自提打包订单 · 提交后请到店取餐</text>
+  </view>
+
   <view class="shop-bar" wx:if="{{tableNo}}">
-    桌号 {{tableNo}} · 共 {{count}} 件
+    {{isPickup ? '自提打包' : '桌号 ' + tableNo}} · 共 {{count}} 件
   </view>
 
   <block wx:if="{{items.length > 0}}">

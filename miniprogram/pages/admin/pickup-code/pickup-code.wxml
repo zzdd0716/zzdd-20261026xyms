@@ -1,0 +1,32 @@
+<view class="page">
+  <view class="card qr-card">
+    <view class="qr-title">自提码 · 取餐码</view>
+    <view class="qr-box">
+      <image
+        wx:if="{{qrSrc}}"
+        class="qr-img"
+        src="{{qrSrc}}"
+        mode="aspectFit"
+        show-menu-by-longpress
+        bindload="onQrLoad"
+        binderror="onQrError"></image>
+      <view wx:else class="qr-empty">
+        <text class="qr-empty-icon" wx:if="{{qrLoading}}">⏳</text>
+        <text class="qr-empty-icon" wx:else>🥡</text>
+        <text wx:if="{{qrLoading}}">二维码生成中，请稍候（调用微信接口，约需3-8秒）…</text>
+        <text wx:else>二维码加载中…</text>
+      </view>
+    </view>
+    <view class="qr-tip">顾客用微信扫描此码，自动进入自提模式：所有菜品默认打包、不可更改，下单后到店取餐。长按二维码可识别。</view>
+
+    <view class="env-row">
+      <view class="env-item {{env === 'release' ? 'active' : ''}}" data-env="release" bindtap="switchEnv">正式版</view>
+      <view class="env-item {{env === 'trial' ? 'active' : ''}}" data-env="trial" bindtap="switchEnv">体验版</view>
+      <view class="env-item {{env === 'develop' ? 'active' : ''}}" data-env="develop" bindtap="switchEnv">开发版</view>
+    </view>
+
+    <button class="btn-primary save-btn" bindtap="saveQr">保存二维码到相册</button>
+  </view>
+
+  <view class="tip">提示：二维码由微信官方接口实时生成（无限量）。「正式版」需要小程序已发布；联调阶段可切「开发版」。打印后张贴在前台/取餐处即可。</view>
+</view>

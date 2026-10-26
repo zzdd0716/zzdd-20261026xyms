@@ -11,20 +11,29 @@ Page({
     count: 0,
     total: 0,
     submitting: false,
-    tableNo: ''
+    tableNo: '',
+    isPickup: false
   },
 
   onShow() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 1 });
     }
-    this.setData({ tableNo: app.globalData.tableNo });
+    this.setData({
+      tableNo: app.globalData.tableNo,
+      isPickup: app.globalData.entryMode === 'pickup'
+    });
     this.loadCart();
   },
 
   loadCart() {
     const c = app.calcCart(app.getCart());
     this.setData({ items: c.items, count: c.count, total: c.total });
+  },
+
+  /** 空购物车时跳转到点餐页 */
+  goMenu() {
+    wx.switchTab({ url: '/pages/menu/menu' });
   },
 
   inc(e) {
@@ -78,7 +87,8 @@ Page({
       util.toast('购物车是空的');
       return;
     }
-    if (!app.globalData.tableId) {
+    // 自提模式无桌台（tableId=0），堂食必须已选桌台
+    if (!app.globalData.tableId && app.globalData.entryMode !== 'pickup') {
       util.toast('请先选择桌台');
       return;
     }
@@ -109,7 +119,9 @@ Page({
       this.setData({ submitting: false });
       wx.showModal({
         title: '下单成功！',
-        content: '订单已送达后厨，请耐心等待上菜\n订单号：' + (order.orderNo || ''),
+        content: (app.globalData.entryMode === 'pickup'
+          ? '订单已通知后厨打包，请留意取餐叫号\n'
+          : '订单已送达后厨，请耐心等待上菜\n') + '订单号：' + (order.orderNo || ''),
         confirmText: '查看订单',
         confirmColor: '#ff6b2c',
         success: (res) => {

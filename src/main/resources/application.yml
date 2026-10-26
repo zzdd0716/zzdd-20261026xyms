@@ -12,7 +12,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/qr_ordering?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
     username: root
-    password: ${DB_PASSWORD:79365920}
+    password: ${DB_PASSWORD:your-db-password}
 
 mybatis-plus:
   configuration:
@@ -24,8 +24,23 @@ mybatis-plus:
 
 wechat:
   appid: wx76c9ed9fd79a7c4d
-  secret: 7838f892f16e8893722cd0d21809313c
+  secret: ${WECHAT_SECRET:your-wechat-secret-here}
 
 logging:
   level:
     com.ordering: debug
+
+# 飞书多维表格配置
+feishu:
+  app-id: ${FEISHU_APP_ID:cli_aa570eccc0b89d29}
+  app-secret: ${FEISHU_APP_SECRET:your-feishu-app-secret-here}
+  base-token: XXsubCqCzaKiVbsDOOLcAirRn8c
+
+# AI 功能配置（豆包大模型）
+ai:
+  # 总开关：false 时 AI 接口直接返回"未开启"
+  enabled: true
+  # 火山引擎控制台申请的 API Key
+  api-key: ${AI_API_KEY:your-volcengine-ark-api-key}
+  # 模型名称（接入点 ID）
+  model: ep-20261025181755-qvj6z

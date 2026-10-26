@@ -29,6 +29,11 @@
       <view class="grid-name">桌台管理</view>
       <view class="grid-desc">桌码增删改</view>
     </view>
+    <view class="grid-item" data-page="/pages/admin/pickup-code/pickup-code" bindtap="go">
+      <view class="grid-icon">🥡</view>
+      <view class="grid-name">自提码</view>
+      <view class="grid-desc">自提码二维码 · 默认打包</view>
+    </view>
     <view class="grid-item" data-page="/pages/admin/stats/stats" bindtap="go">
       <view class="grid-icon">💰</view>
       <view class="grid-name">收银统计</view>
@@ -43,6 +48,16 @@
       <view class="grid-icon">👤</view>
       <view class="grid-name">管理员设置</view>
       <view class="grid-desc">通过用户ID添加管理员</view>
+    </view>
+    <view class="grid-item" data-page="/pages/admin/ai-settings/ai-settings" bindtap="go">
+      <view class="grid-icon">🤖</view>
+      <view class="grid-name">AI设置</view>
+      <view class="grid-desc">推荐/客服开关</view>
+    </view>
+    <view class="grid-item" data-page="/pages/admin/ai-qa/ai-qa" bindtap="go">
+      <view class="grid-icon">📚</view>
+      <view class="grid-name">知识库管理</view>
+      <view class="grid-desc">FAQ 增删改查</view>
     </view>
   </view>
 

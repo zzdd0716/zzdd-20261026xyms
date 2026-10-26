@@ -2,7 +2,7 @@
 
 /* 顶部 */
 .header {
-  background: linear-gradient(135deg, #ff6b2c, #ff9a5c);
+  background: linear-gradient(135deg, #ff9a5c, #ff6b2c);
   padding: 28rpx 32rpx;
   color: #fff;
   flex-shrink: 0;
@@ -257,3 +257,234 @@
   padding: 16rpx 48rpx;
   border-radius: 40rpx;
 }
+
+/* 自提模式横幅（自提码进入） */
+.pickup-banner {
+  margin: 16rpx 24rpx 0;
+  background: #fff0e8;
+  border: 2rpx solid #ffd9c2;
+  border-radius: 16rpx;
+  padding: 16rpx 20rpx;
+  display: flex;
+  align-items: center;
+}
+.pickup-banner-icon { font-size: 28rpx; margin-right: 12rpx; }
+.pickup-banner-text { font-size: 24rpx; color: #b3541e; flex: 1; line-height: 1.5; }
+
+/* AI 推荐入口横幅 */
+.ai-banner {
+  margin: 16rpx 24rpx 0;
+  background: linear-gradient(135deg, #f0f4ff, #e8eeff);
+  border-radius: 16rpx;
+  padding: 16rpx 20rpx;
+  display: flex;
+  align-items: center;
+}
+.ai-banner-icon { font-size: 30rpx; margin-right: 12rpx; }
+.ai-banner-text { flex: 1; font-size: 26rpx; color: #4f6b9a; font-weight: 500; }
+.ai-banner-arrow { font-size: 32rpx; color: #4f6b9a; opacity: 0.6; }
+
+/* AI 推荐弹窗 */
+.ai-mask {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ai-dialog {
+  width: 86%;
+  max-height: 70vh;
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 32rpx;
+  display: flex;
+  flex-direction: column;
+}
+.ai-dialog-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+.ai-dialog-title { font-size: 32rpx; font-weight: 700; color: #1a1b1c; }
+.ai-dialog-close { font-size: 28rpx; color: #9a9ea6; padding: 8rpx; }
+
+.ai-input-area { display: flex; flex-direction: column; gap: 20rpx; }
+.ai-input {
+  background: #f6f7f9;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  font-size: 26rpx;
+  min-height: 80rpx;
+}
+.ai-submit-btn {
+  background: #ff6b2c;
+  color: #fff;
+  text-align: center;
+  padding: 20rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+.ai-submit-btn.disabled { opacity: 0.6; }
+
+.ai-result-area { display: flex; flex-direction: column; gap: 16rpx; }
+.ai-result-title { font-size: 26rpx; color: #5f6670; }
+.ai-result-list { max-height: 400rpx; }
+.ai-result-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.ai-result-name { font-size: 28rpx; color: #1a1b1c; }
+.ai-result-price { font-size: 26rpx; color: #ff6b2c; margin-top: 4rpx; }
+.ai-result-add {
+  background: #ff6b2c;
+  color: #fff;
+  font-size: 24rpx;
+  padding: 10rpx 24rpx;
+  border-radius: 30rpx;
+}
+.ai-result-again {
+  text-align: center;
+  font-size: 24rpx;
+  color: #9a9ea6;
+  padding: 16rpx;
+}
+
+.ai-result-hint {
+  text-align: center;
+  font-size: 22rpx;
+  color: #9a9ea6;
+  padding: 8rpx 0;
+}
+.ai-result-actions {
+  display: flex;
+  gap: 16rpx;
+  padding: 16rpx 0 0;
+}
+.ai-refresh-btn {
+  flex: 1;
+  text-align: center;
+  background: #f0f4ff;
+  color: #4f6b9a;
+  font-size: 26rpx;
+  padding: 18rpx;
+  border-radius: 40rpx;
+  font-weight: 500;
+}
+.ai-refresh-btn.disabled {
+  opacity: 0.5;
+}
+.ai-reset-btn {
+  flex: 1;
+  text-align: center;
+  background: #f6f7f9;
+  color: #9a9ea6;
+  font-size: 26rpx;
+  padding: 18rpx;
+  border-radius: 40rpx;
+}
+
+/* 悬浮客服按钮 */
+.chat-fab {
+  position: fixed;
+  right: 24rpx;
+  bottom: 200rpx;
+  width: 96rpx;
+  height: 96rpx;
+  background: linear-gradient(135deg, #ff9a5c, #ff6b2c);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6rpx 20rpx rgba(255, 107, 44, 0.4);
+  z-index: 999;
+}
+.chat-fab-icon { font-size: 44rpx; color: #fff; }
+
+/* 客服聊天弹窗 */
+.chat-mask {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+}
+.chat-dialog {
+  width: 100%;
+  height: 70vh;
+  background: #f6f7f9;
+  border-radius: 24rpx 24rpx 0 0;
+  display: flex;
+  flex-direction: column;
+}
+.chat-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 32rpx;
+  background: #fff;
+  border-radius: 24rpx 24rpx 0 0;
+}
+.chat-title { font-size: 30rpx; font-weight: 700; color: #1a1b1c; }
+.chat-close { font-size: 28rpx; color: #9a9ea6; padding: 8rpx; }
+
+.chat-messages {
+  flex: 1;
+  padding: 24rpx;
+  overflow-y: auto;
+}
+.chat-msg {
+  display: flex;
+  margin-bottom: 20rpx;
+}
+.chat-msg.ai { justify-content: flex-start; }
+.chat-msg.user { justify-content: flex-end; }
+.chat-bubble {
+  max-width: 70%;
+  padding: 16rpx 20rpx;
+  border-radius: 16rpx;
+  font-size: 26rpx;
+  line-height: 1.5;
+}
+.chat-msg.ai .chat-bubble {
+  background: #fff;
+  color: #1a1b1c;
+  border-top-left-radius: 4rpx;
+}
+.chat-msg.user .chat-bubble {
+  background: #ff6b2c;
+  color: #fff;
+  border-top-right-radius: 4rpx;
+}
+
+.chat-input-area {
+  display: flex;
+  gap: 16rpx;
+  padding: 20rpx 24rpx;
+  background: #fff;
+  align-items: center;
+}
+.chat-input {
+  flex: 1;
+  background: #f6f7f9;
+  border-radius: 36rpx;
+  padding: 16rpx 24rpx;
+  font-size: 26rpx;
+}
+.chat-send-btn {
+  background: #ff6b2c;
+  color: #fff;
+  font-size: 26rpx;
+  padding: 16rpx 32rpx;
+  border-radius: 36rpx;
+  font-weight: 500;
+}
+.chat-send-btn.disabled { opacity: 0.5; }

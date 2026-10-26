@@ -41,7 +41,7 @@ public class MenuServiceImpl implements MenuService {
         if (categoryId != null) {
             wrapper.eq(Dish::getCategoryId, categoryId);
         }
-        wrapper.orderByAsc(Dish::getCategoryId).orderByDesc(Dish::getIsRecommend);
+        wrapper.orderByAsc(Dish::getCategoryId);
         List<Dish> dishes = dishMapper.selectList(wrapper);
         // 附带规格组与选项（选规格/双拼）
         dishSpecService.fillSpecs(dishes);

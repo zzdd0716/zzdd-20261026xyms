@@ -18,27 +18,64 @@ Page({
     periodName: '每天',
     cashier: null,
     sales: [],
+    startDate: '',
+    endDate: '',
+    today: '',
     // 饼图色板（与图例共用）
-    legendColors: ['#FF6B2C', '#409EFF', '#67C23A', '#E6A23C', '#F56C6C', '#909399'],
+    legendColors: ['#ff6b2c', '#409EFF', '#67C23A', '#E6A23C', '#F56C6C', '#909399'],
     loading: false
   },
 
   onLoad() {
+    const today = this.formatDate(new Date());
+    this.setData({ today });
+    this.load();
+  },
+
+  /** 格式化日期 yyyy-MM-dd */
+  formatDate(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + day;
+  },
+
+  onStartDateChange(e) {
+    this.setData({ startDate: e.detail.value });
+  },
+
+  onEndDateChange(e) {
+    this.setData({ endDate: e.detail.value });
+  },
+
+  /** 按自定义时间段查询 */
+  searchByDate() {
+    if (!this.data.startDate) {
+      util.toast('请选择开始日期');
+      return;
+    }
+    this.load();
+  },
+
+  /** 重置日期，回到预设周期 */
+  resetDate() {
+    this.setData({ startDate: '', endDate: '' });
     this.load();
   },
 
   switchPeriod(e) {
     const key = e.currentTarget.dataset.key;
     const p = PERIODS.find(x => x.key === key);
-    this.setData({ period: key, periodName: p ? p.name : '' });
+    this.setData({ period: key, periodName: p ? p.name : '', startDate: '', endDate: '' });
     this.load();
   },
 
   load() {
     this.setData({ loading: true });
+    const { period, startDate, endDate } = this.data;
     Promise.all([
-      api.cashierSummary(this.data.period),
-      api.salesSummary(this.data.period, 5)
+      api.cashierSummary(period, startDate, endDate),
+      api.salesSummary(period, 5, startDate, endDate)
     ]).then(([cashier, sales]) => {
       const rows = (cashier.rows || []).map(r => ({
         ...r,

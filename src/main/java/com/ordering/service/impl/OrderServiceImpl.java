@@ -187,29 +187,52 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public CashierSummaryDTO cashierSummary(String period) {
-        // 有效订单 = 排除已取消(5)/已退款(6)
+    public CashierSummaryDTO cashierSummary(String period, String startDate, String endDate) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime start, end;
+        boolean customRange = (startDate != null && !startDate.isEmpty());
+
+        if (customRange) {
+            // 自定义时间段
+            start = LocalDate.parse(startDate).atStartOfDay();
+            end = (endDate != null && !endDate.isEmpty())
+                    ? LocalDate.parse(endDate).plusDays(1).atStartOfDay()
+                    : start.plusDays(1);
+        } else {
+            // 按预设周期
+            LocalDateTime[] range = periodRange(period, now);
+            start = range[0];
+            end = range[1];
+        }
+
+        // 只查询当前周期内的有效订单（排除已取消5/已退款6）
         List<Orders> orders = ordersMapper.selectList(
                 new LambdaQueryWrapper<Orders>()
                         .notIn(Orders::getStatus, Arrays.asList(5, 6))
+                        .ge(Orders::getCreateTime, start)
+                        .lt(Orders::getCreateTime, end)
                         .orderByAsc(Orders::getCreateTime)
         );
+
+        // 按更细粒度分组：自定义/天→按天, week→天, month→天, quarter→月
         Map<String, BigDecimal> amounts = new TreeMap<>();
         Map<String, Integer> counts = new TreeMap<>();
         Map<String, String> labels = new TreeMap<>();
         BigDecimal total = BigDecimal.ZERO;
         int totalOrders = 0;
+
         for (Orders o : orders) {
             LocalDateTime ct = o.getCreateTime();
             if (ct == null) continue;
             BigDecimal amt = o.getTotalAmount() == null ? BigDecimal.ZERO : o.getTotalAmount();
             total = total.add(amt);
             totalOrders++;
-            String[] kl = periodKey(period, ct);
+            String[] kl = customRange ? detailKey("day", ct) : detailKey(period, ct);
             amounts.merge(kl[0], amt, BigDecimal::add);
             counts.merge(kl[0], 1, Integer::sum);
             labels.put(kl[0], kl[1]);
         }
+
         List<CashierRowDTO> rows = new ArrayList<>();
         for (String key : amounts.keySet()) {
             CashierRowDTO r = new CashierRowDTO();
@@ -226,20 +249,71 @@ public class OrderServiceImpl implements OrderService {
         return dto;
     }
 
+    /** 计算当前周期的时间范围 [start, end) */
+    private LocalDateTime[] periodRange(String period, LocalDateTime now) {
+        LocalDate d = now.toLocalDate();
+        if ("week".equals(period)) {
+            LocalDate mon = d.minusDays(d.getDayOfWeek().getValue() - 1L);
+            return new LocalDateTime[]{ mon.atStartOfDay(), mon.plusDays(7).atStartOfDay() };
+        }
+        if ("month".equals(period)) {
+            LocalDate first = d.withDayOfMonth(1);
+            return new LocalDateTime[]{ first.atStartOfDay(), first.plusMonths(1).atStartOfDay() };
+        }
+        if ("quarter".equals(period)) {
+            int q = (d.getMonthValue() - 1) / 3;
+            LocalDate first = d.withMonth(q * 3 + 1).withDayOfMonth(1);
+            return new LocalDateTime[]{ first.atStartOfDay(), first.plusMonths(3).atStartOfDay() };
+        }
+        // day：今天
+        return new LocalDateTime[]{ d.atStartOfDay(), d.plusDays(1).atStartOfDay() };
+    }
+
+    /** 明细粒度的key和标签：day→小时, week→天, month→天, quarter→月 */
+    private String[] detailKey(String period, LocalDateTime ct) {
+        if ("day".equals(period)) {
+            int hour = ct.getHour();
+            String label = String.format("%02d:00-%02d:00", hour, hour + 1);
+            return new String[]{ String.valueOf(hour), label };
+        }
+        if ("week".equals(period) || "month".equals(period)) {
+            LocalDate d = ct.toLocalDate();
+            return new String[]{ d.toString(), d.getMonthValue() + "月" + d.getDayOfMonth() + "日" };
+        }
+        if ("quarter".equals(period)) {
+            LocalDate d = ct.toLocalDate();
+            return new String[]{ d.getYear() + "-" + d.getMonthValue(), d.getMonthValue() + "月" };
+        }
+        return new String[]{ ct.toLocalDate().toString(), ct.toLocalDate().toString() };
+    }
+
     @Override
-    public SalesSummaryDTO salesSummary(String period, Integer limit) {
+    public SalesSummaryDTO salesSummary(String period, Integer limit, String startDate, String endDate) {
         int top = (limit == null || limit < 1) ? 5 : limit;
         LocalDateTime now = LocalDateTime.now();
-        String nowKey = periodKey(period, now)[0];
-        // 当前周期内的有效订单
+        LocalDateTime start, end;
+        boolean customRange = (startDate != null && !startDate.isEmpty());
+
+        if (customRange) {
+            start = LocalDate.parse(startDate).atStartOfDay();
+            end = (endDate != null && !endDate.isEmpty())
+                    ? LocalDate.parse(endDate).plusDays(1).atStartOfDay()
+                    : start.plusDays(1);
+        } else {
+            LocalDateTime[] range = periodRange(period, now);
+            start = range[0];
+            end = range[1];
+        }
+
+        // 直接按时间范围查询当前周期内的有效订单
         List<Orders> orders = ordersMapper.selectList(
-                new LambdaQueryWrapper<Orders>().notIn(Orders::getStatus, Arrays.asList(5, 6)));
+                new LambdaQueryWrapper<Orders>()
+                        .notIn(Orders::getStatus, Arrays.asList(5, 6))
+                        .ge(Orders::getCreateTime, start)
+                        .lt(Orders::getCreateTime, end));
         List<Long> orderIds = new ArrayList<>();
         for (Orders o : orders) {
-            LocalDateTime ct = o.getCreateTime();
-            if (ct != null && periodKey(period, ct)[0].equals(nowKey)) {
-                orderIds.add(o.getId());
-            }
+            orderIds.add(o.getId());
         }
         // 聚合各菜品销量与销售额（金额按分存储避免浮点误差）
         Map<String, long[]> agg = new HashMap<>(); // name -> [qty, amount分]

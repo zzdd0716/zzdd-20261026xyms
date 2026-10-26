@@ -16,7 +16,10 @@
     "pages/admin/tables/tables",
     "pages/admin/stats/stats",
     "pages/admin/stock/stock",
-    "pages/admin/admin-manage/admin-manage"
+    "pages/admin/pickup-code/pickup-code",
+    "pages/admin/admin-manage/admin-manage",
+    "pages/admin/ai-settings/ai-settings",
+    "pages/admin/ai-qa/ai-qa"
   ],
   "window": {
     "navigationBarBackgroundColor": "#ff6b2c",

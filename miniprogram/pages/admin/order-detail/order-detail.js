@@ -32,7 +32,7 @@ Page({
         order,
         items: items || [],
         tables,
-        tableNo: t ? t.tableNo : ('桌' + (order.tableId || '-'))
+        tableNo: t ? t.tableNo : (order.tableId ? ('桌' + order.tableId) : '自提')
       });
     }).catch(e => {
       util.toast('加载失败：' + e.message);

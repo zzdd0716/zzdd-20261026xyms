@@ -1,4 +1,4 @@
-﻿<wxs module="fmt">
+<wxs module="fmt">
 module.exports = function (n) {
   var v = n * 1;
   if (v !== v) return '0.00';
@@ -22,6 +22,29 @@ module.exports = function (n) {
       wx:key="key"
       data-key="{{item.key}}"
       bindtap="switchPeriod">{{item.name}}</view>
+  </view>
+
+  <!-- 自定义时间段筛选 -->
+  <view class="date-filter card">
+    <view class="date-row">
+      <picker mode="date" value="{{startDate}}" end="{{today}}" bindchange="onStartDateChange">
+        <view class="date-picker">
+          <text class="date-label">开始</text>
+          <text class="date-value">{{startDate || '选择日期'}}</text>
+        </view>
+      </picker>
+      <text class="date-sep">至</text>
+      <picker mode="date" value="{{endDate}}" end="{{today}}" bindchange="onEndDateChange">
+        <view class="date-picker">
+          <text class="date-label">结束</text>
+          <text class="date-value">{{endDate || '选择日期'}}</text>
+        </view>
+      </picker>
+    </view>
+    <view class="date-actions">
+      <view class="btn-primary btn-small" bindtap="searchByDate">查询</view>
+      <view class="btn-plain btn-small" bindtap="resetDate">重置</view>
+    </view>
   </view>
 
   <view wx:if="{{loading}}" class="empty-tip"><text class="empty-icon">⏳</text>统计中…</view>

@@ -10,6 +10,7 @@ const App = {
       { key: 'dish', name: '菜品管理', icon: '🍽️' },
       { key: 'category', name: '分类管理', icon: '📂' },
       { key: 'table', name: '桌台管理', icon: '🪑' },
+      { key: 'pickup', name: '自提码', icon: '🥡' },
       { key: 'order', name: '订单管理', icon: '📋' },
       { key: 'cashier', name: '收银统计', icon: '💰' }
     ];
@@ -17,6 +18,20 @@ const App = {
       const m = menus.find(x => x.key === current.value);
       return m ? m.name : '';
     });
+
+    // ========== 自提码 ==========
+    const pickupEnv = ref('release'); // release 正式 / trial 体验 / develop 开发
+    const pickupTs = ref(Date.now());
+    const pickupQrUrl = computed(() => '/api/admin/pickup/qrcode?env=' + pickupEnv.value + '&t=' + pickupTs.value);
+    const pickupEnvName = computed(() => ({ release: '正式版', trial: '体验版', develop: '开发版' }[pickupEnv.value] || '正式版'));
+    function switchPickupEnv(env) {
+      if (env === pickupEnv.value) return;
+      pickupEnv.value = env;
+      pickupTs.value = Date.now(); // 换时间戳强制刷新图片
+    }
+    function refreshPickupQr() {
+      pickupTs.value = Date.now();
+    }
 
     const shopId = Api.SHOP_ID;
 
@@ -535,6 +550,7 @@ const App = {
       } catch (e) { errToast(e); } finally { orderLoading.value = false; }
     }
     const tableNo = (id) => {
+      if (!id) return '自提'; // 自提码下单无桌台
       const t = tables.value.find(x => x.id === id);
       return t ? t.tableNo : ('桌' + id);
     };
@@ -641,6 +657,7 @@ const App = {
 
     return {
       current, menus, currentTitle, shopId,
+      pickupQrUrl, pickupEnvName, switchPickupEnv, refreshPickupQr,
       dishes, categories, dishLoading, cateLoading, dishFilterCate, dishKeyword, filteredDishes, clearDishSearch, cateName,
       dishView, dishCurrentCate, dishPriceSort, dishPriceSortText, enterDishCates, enterDishList, toggleDishPriceSort, cateDishCount, currentCateDishes,
       clearanceKeyword, clearanceSelectedIds, clearanceRunning, clearanceMode, clearanceCategoryId, enterDishClearance, setClearanceMode,

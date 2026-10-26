@@ -28,6 +28,8 @@ Page({
       // 附加状态文案与样式
       const orders = (list || []).map(o => ({
         ...o,
+        // 自提订单 tableId=0，桌号显示"自提"而非"-"
+        tableNoText: o.tableId === 0 ? '自提' : (o.tableId ? String(o.tableId) : '-'),
         statusText: util.orderStatusText(o.status),
         statusTag: util.orderStatusTag(o.status)
       }));

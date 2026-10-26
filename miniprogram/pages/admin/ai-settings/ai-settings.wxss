@@ -1,0 +1,31 @@
+.page { padding: 24rpx; }
+
+.section {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 16rpx 24rpx;
+}
+.section-title {
+  font-size: 26rpx;
+  color: #909399;
+  padding: 16rpx 0;
+}
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 0;
+  border-bottom: 2rpx solid #f6f7f9;
+}
+.setting-row:last-child { border-bottom: none; }
+.setting-info { flex: 1; }
+.setting-name { font-size: 30rpx; color: #303133; }
+.setting-desc { font-size: 24rpx; color: #909399; margin-top: 6rpx; }
+
+.tip {
+  margin: 32rpx 24rpx;
+  font-size: 22rpx;
+  color: #b0b3ba;
+  text-align: center;
+  line-height: 1.6;
+}

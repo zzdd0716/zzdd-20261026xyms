@@ -40,3 +40,16 @@
 
 .empty-tip { text-align: center; padding: 160rpx 0; color: #b0b3ba; }
 .go-menu { width: 280rpx; margin: 40rpx auto 0; }
+
+/* 自提打包横幅 */
+.pickup-bar {
+  margin: 16rpx 24rpx 0;
+  background: #fff0e8;
+  border: 2rpx solid #ffd9c2;
+  border-radius: 16rpx;
+  padding: 16rpx 20rpx;
+  display: flex;
+  align-items: center;
+}
+.pickup-bar-icon { font-size: 28rpx; margin-right: 12rpx; }
+.pickup-bar-text { font-size: 24rpx; color: #b3541e; flex: 1; }

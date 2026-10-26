@@ -6,7 +6,8 @@
       <view class="avatar-edit">📷</view>
     </view>
     <view class="hero-name" bindtap="editNickname">{{nickname || '微信用户'}} ✏️</view>
-    <view class="hero-sub" wx:if="{{tableNo}}">桌号 {{tableNo}}</view>
+    <view class="hero-sub" wx:if="{{isPickup}}">自提打包 · 扫码自提码进入</view>
+    <view class="hero-sub" wx:elif="{{tableNo}}">桌号 {{tableNo}}</view>
     <view class="hero-sub" wx:else>未选择桌台</view>
   </view>
 
@@ -28,6 +29,11 @@
       <text class="menu-arrow">›</text>
     </view>
     <view class="table-tip">根据餐桌位置上菜，请勿轻易换桌</view>
+    <view class="menu-row" bindtap="openChat">
+      <text class="menu-icon">💬</text>
+      <text class="menu-text">智能客服</text>
+      <text class="menu-arrow">›</text>
+    </view>
     <view class="menu-row" bindtap="goAdmin" wx:if="{{isAdmin}}">
       <text class="menu-icon">⚙️</text>
       <text class="menu-text">商家管理后台</text>
@@ -36,4 +42,26 @@
   </view>
 
   <view class="page-tip">顾客端仅展示点餐相关功能；商家后台包含接单、菜品、分类、桌台与收银统计。</view>
+
+  <!-- AI 客服聊天弹窗 -->
+  <view class="chat-mask" wx:if="{{chatVisible}}" bindtap="closeChat">
+    <view class="chat-dialog" catchtap="noop">
+      <view class="chat-head">
+        <text class="chat-title">💬 智能客服</text>
+        <text class="chat-close" bindtap="closeChat">✕</text>
+      </view>
+      <scroll-view scroll-y class="chat-messages">
+        <view class="chat-msg {{item.role === 'user' ? 'user' : 'ai'}}" wx:for="{{chatHistory}}" wx:key="index">
+          <view class="chat-bubble">{{item.content}}</view>
+        </view>
+        <view class="chat-msg ai" wx:if="{{chatLoading}}">
+          <view class="chat-bubble">正在输入…</view>
+        </view>
+      </scroll-view>
+      <view class="chat-input-area">
+        <input class="chat-input" placeholder="" value="{{chatInput}}" bindinput="onChatInput" confirm-type="send" bindconfirm="sendChat" />
+        <view class="chat-send {{chatLoading ? 'disabled' : ''}}" bindtap="sendChat">发送</view>
+      </view>
+    </view>
+  </view>
 </view>

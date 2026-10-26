@@ -1,7 +1,7 @@
 .page { min-height: 100vh; padding-bottom: 60rpx; }
 
 .hero {
-  background: linear-gradient(135deg, #ff6b2c, #ff9a5c);
+  background: linear-gradient(135deg, #ff9a5c, #ff6b2c);
   padding: 56rpx 40rpx;
   text-align: center;
   color: #fff;
@@ -75,3 +75,69 @@
 .leg-right-mini { right: 8rpx; }
 
 .page-tip { margin: 40rpx 40rpx 0; font-size: 22rpx; color: #b0b3ba; text-align: center; line-height: 1.7; }
+
+/* AI 客服聊天弹窗 */
+.chat-mask {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #f6f7f9;
+  z-index: 10000;
+}
+.chat-dialog {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.chat-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 32rpx;
+  background: #fff;
+  border-radius: 24rpx 24rpx 0 0;
+}
+.chat-title { font-size: 30rpx; font-weight: 700; color: #1a1b1c; }
+.chat-close { font-size: 28rpx; color: #9a9ea6; padding: 8rpx; }
+.chat-messages { flex: 1; padding: 24rpx; overflow-y: auto; box-sizing: border-box; padding-bottom: 40rpx; }
+.chat-msg { display: flex; margin-bottom: 20rpx; }
+.chat-msg.ai { justify-content: flex-start; }
+.chat-msg.user { justify-content: flex-end; }
+.chat-bubble {
+  max-width: 75%;
+  padding: 16rpx 20rpx;
+  border-radius: 16rpx;
+  font-size: 26rpx;
+  line-height: 1.5;
+  word-break: break-all;
+  box-sizing: border-box;
+}
+.chat-msg.ai .chat-bubble { background: #fff; color: #1a1b1c; border-top-left-radius: 4rpx; }
+.chat-msg.user .chat-bubble { background: #ff6b2c; color: #fff; border-top-right-radius: 4rpx; }
+.chat-input-area {
+  display: flex;
+  gap: 16rpx;
+  padding: 20rpx 24rpx;
+  padding-bottom: 40rpx;
+  background: #fff;
+  align-items: center;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+.chat-input {
+  flex: 1;
+  background: #f6f7f9;
+  border-radius: 36rpx;
+  padding: 16rpx 24rpx;
+  font-size: 26rpx;
+}
+.chat-send {
+  background: #ff6b2c;
+  color: #fff;
+  font-size: 26rpx;
+  padding: 16rpx 32rpx;
+  border-radius: 36rpx;
+  font-weight: 500;
+}
+.chat-send.disabled { opacity: 0.5; }

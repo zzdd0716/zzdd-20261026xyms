@@ -1,0 +1,23 @@
+<view class="page">
+  <view class="section">
+    <view class="section-title">功能开关</view>
+
+    <view class="setting-row">
+      <view class="setting-info">
+        <view class="setting-name">AI菜品推荐</view>
+        <view class="setting-desc">顾客输入口味偏好，AI自动推荐菜品</view>
+      </view>
+      <switch checked="{{recommendEnabled}}" bindchange="onRecommendChange" color="#ff6b2c" />
+    </view>
+
+    <view class="setting-row">
+      <view class="setting-info">
+        <view class="setting-name">智能客服</view>
+        <view class="setting-desc">顾客提问，AI根据知识库自动回答</view>
+      </view>
+      <switch checked="{{chatEnabled}}" bindchange="onChatChange" color="#ff6b2c" />
+    </view>
+  </view>
+
+  <view class="tip">关闭后，顾客端对应功能将不可用，无需重启后端。</view>
+</view>

@@ -93,9 +93,6 @@ public class ShopAdminServiceImpl implements ShopAdminService {
             if (dish.getStock() == null) {
                 dish.setStock(0);
             }
-            if (dish.getIsRecommend() == null) {
-                dish.setIsRecommend(0);
-            }
             dishMapper.insert(dish);
         } else {
             // 检测状态变化：下架→上架 或 上架→下架，联动处理关联规格选项

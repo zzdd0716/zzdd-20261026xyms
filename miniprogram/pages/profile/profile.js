@@ -8,13 +8,19 @@ const app = getApp();
 Page({
   data: {
     tableNo: '',
+    isPickup: false,
     shopId: 1,
     userId: null,
     openidTail: '',
     isAdmin: false,
     baseUrl: config.BASE_URL,
     nickname: '',
-    avatar: ''
+    avatar: '',
+    // AI 客服
+    chatVisible: false,
+    chatHistory: [],
+    chatInput: '',
+    chatLoading: false
   },
 
   onShow() {
@@ -24,6 +30,7 @@ Page({
     const g = app.globalData;
     this.setData({
       tableNo: g.tableNo,
+      isPickup: g.entryMode === 'pickup',
       shopId: g.shopId,
       userId: g.userId,
       isAdmin: g.isAdmin,
@@ -135,5 +142,51 @@ Page({
       return;
     }
     wx.navigateTo({ url: '/pages/admin/home/home' });
-  }
+  },
+
+  // ==================== AI 智能客服 ====================
+
+  /** 打开客服弹窗 */
+  openChat() {
+    this.setData({
+      chatVisible: true,
+      chatHistory: [{ role: 'ai', content: '你好！我是禧粤美食智能客服，有什么可以帮你的？' }],
+      chatInput: ''
+    });
+  },
+
+  /** 关闭客服弹窗 */
+  closeChat() {
+    this.setData({ chatVisible: false });
+  },
+
+  /** 输入问题 */
+  onChatInput(e) {
+    this.setData({ chatInput: e.detail.value });
+  },
+
+  /** 发送问题给AI */
+  sendChat() {
+    const text = (this.data.chatInput || '').trim();
+    if (!text || this.data.chatLoading) return;
+
+    const shopId = this.data.shopId;
+    const history = this.data.chatHistory.concat([{ role: 'user', content: text }]);
+    this.setData({ chatHistory: history, chatInput: '', chatLoading: true });
+
+    api.aiChat(shopId, text).then(reply => {
+      this.setData({
+        chatHistory: this.data.chatHistory.concat([{ role: 'ai', content: reply }]),
+        chatLoading: false
+      });
+    }).catch(() => {
+      this.setData({
+        chatHistory: this.data.chatHistory.concat([{ role: 'ai', content: '抱歉，我暂时答不上来，请联系店员。' }]),
+        chatLoading: false
+      });
+    });
+  },
+
+  /** 阻止冒泡占位 */
+  noop() {}
 });

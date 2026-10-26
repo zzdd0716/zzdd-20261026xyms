@@ -47,8 +47,9 @@ Page({
     });
   },
 
-  /** 桌号映射（订单接口只有 tableId） */
+  /** 桌号映射（订单接口只有 tableId）；0 表示自提码下单 */
   tableNo(tableId) {
+    if (!tableId) return '自提';
     const t = this.data.tables && this.data.tables.find(x => x.id === tableId);
     return t ? t.tableNo : ('桌' + tableId);
   },

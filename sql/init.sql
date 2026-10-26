@@ -77,7 +77,6 @@ CREATE TABLE `dish` (
   `price`         DECIMAL(10,2)   NOT NULL                COMMENT '价格（元）',
   `stock`         INT             NOT NULL DEFAULT 0      COMMENT '库存，0表示不限量',
   `sold_count`    INT             NOT NULL DEFAULT 0      COMMENT '累计销量',
-  `is_recommend`  TINYINT         NOT NULL DEFAULT 0      COMMENT '是否推荐：1推荐 0普通',
   `status`        TINYINT         NOT NULL DEFAULT 1      COMMENT '状态：1上架 0下架',
   `create_time`   DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time`   DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -230,13 +229,13 @@ INSERT INTO `category` (`shop_id`, `name`, `sort_order`) VALUES
 (1, '饮品', 4);
 
 -- 示例菜品
-INSERT INTO `dish` (`shop_id`, `category_id`, `name`, `description`, `price`, `stock`, `is_recommend`) VALUES
-(1, 1, '剁椒鱼头', '招牌辣味，鲜嫩入味', 68.00, 0, 1),
-(1, 1, '毛氏红烧肉', '肥而不腻，入口即化', 58.00, 0, 1),
-(1, 2, '辣椒炒肉', '湖南经典家常菜', 38.00, 0, 0),
-(1, 2, '清炒时蔬', '当季新鲜蔬菜', 22.00, 0, 0),
-(1, 3, '米饭', '东北大米', 3.00, 0, 0),
-(1, 4, '冰红茶', '冰爽解腻', 6.00, 0, 0);
+INSERT INTO `dish` (`shop_id`, `category_id`, `name`, `description`, `price`, `stock`) VALUES
+(1, 1, '剁椒鱼头', '招牌辣味，鲜嫩入味', 68.00, 0),
+(1, 1, '毛氏红烧肉', '肥而不腻，入口即化', 58.00, 0),
+(1, 2, '辣椒炒肉', '湖南经典家常菜', 38.00, 0),
+(1, 2, '清炒时蔬', '当季新鲜蔬菜', 22.00, 0),
+(1, 3, '米饭', '东北大米', 3.00, 0),
+(1, 4, '冰红茶', '冰爽解腻', 6.00, 0);
 
 -- ============================================================
 -- 示例规格数据（选规格 + 双拼 演示）

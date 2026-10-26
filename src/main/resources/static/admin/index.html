@@ -280,6 +280,39 @@
         </el-card>
       </div>
 
+      <!-- 自提码 -->
+      <div v-show="current==='pickup'">
+        <div class="toolbar">
+          <div>
+            <el-button @click="refreshPickupQr">刷新二维码</el-button>
+          </div>
+          <div style="display:flex;gap:10px;">
+            <el-button :type="pickupEnv==='release'?'primary':''" size="small" @click="switchPickupEnv('release')">正式版</el-button>
+            <el-button :type="pickupEnv==='trial'?'primary':''" size="small" @click="switchPickupEnv('trial')">体验版</el-button>
+            <el-button :type="pickupEnv==='develop'?'primary':''" size="small" @click="switchPickupEnv('develop')">开发版</el-button>
+          </div>
+        </div>
+        <el-card>
+          <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start;">
+            <div style="text-align:center;">
+              <img :src="pickupQrUrl" alt="自提码" style="width:320px;height:320px;border:1px solid #ebeef5;border-radius:12px;padding:12px;background:#fff;">
+              <div class="text-muted" style="margin-top:12px;">当前：{{pickupEnvName}} · 无限量小程序码</div>
+              <a :href="pickupQrUrl" download="自提码.jpg" style="display:inline-block;margin-top:14px;">
+                <el-button type="primary" plain>下载二维码</el-button>
+              </a>
+            </div>
+            <div style="flex:1;min-width:260px;line-height:2;font-size:14px;color:#606266;">
+              <div class="card-title">自提码 · 取餐码</div>
+              <div>顾客用微信扫描此码，自动进入<b>自提模式</b>：</div>
+              <div>· 所有菜品默认<b style="color:#e6a23c;">打包</b>，规格中「堂食/打包」不可更改</div>
+              <div>· 账号登录信息与堂食扫码完全一致</div>
+              <div>· 下单后订单以「自提」桌号进入后厨，按打包出餐</div>
+              <div style="margin-top:8px;color:#909399;">提示：「正式版」需小程序已发布；联调阶段可切「开发版」。打印后张贴在前台/取餐处即可。</div>
+            </div>
+          </div>
+        </el-card>
+      </div>
+
       <!-- 订单管理 -->
       <div v-show="current==='order'">
         <div class="toolbar">

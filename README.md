@@ -50,7 +50,7 @@ xyms/
 4. **运行**：找到 `com.ordering.QrOrderingApplication`，右键 Run。
 5. **验证**：浏览器访问 `http://localhost:8080/api/menu/dishes?shopId=1`，返回菜品 JSON 即成功。
 
-> 数据库连接默认使用 root / 79365920，可在 `application.yml` 中修改，或用环境变量 `DB_PASSWORD` 覆盖。
+> 数据库连接默认使用 root / your-db-password，可在 `application.yml` 中修改，或用环境变量 `DB_PASSWORD` 覆盖。
 
 ## 微信小程序端（miniprogram/）
 
@@ -82,6 +82,14 @@ xyms/
 - 小程序首次启动会在本地生成唯一 openid，调用后端新增的 `POST /api/user/login` 自动注册并换取 `userId`；
 - 下单时携带 `userId` 落库到 `orders.user_id`（表结构原有字段，无需改表），「我的订单」按 `userId` 过滤；
 - 后端 `GET /api/order/list` 新增可选参数 `userId`（不传仍查全部，兼容原 H5 商家后台）。
+
+### 自提码（本期新增）
+- **入口**：自提码为带 `type=pickup` 场景参数的小程序码（scene=`type=pickup`），扫码进入自提模式；首页另有「自提取餐」入口可模拟扫码。
+- **二维码在哪**：商家管理后台新增「自提码」板块（小程序端 admin 工作台宫格 + H5 后台侧边栏），实时调用微信官方接口生成无限量小程序码，可保存到相册/下载打印（正式版/体验版/开发版可切换，联调用开发版）。后端接口：`GET /api/admin/pickup/qrcode?env=release`。
+- **账号不变**：自提码进入不改变登录/注册流程，仍走 `wx.login` 换 `openid` 与 `userId`，订单归属同一用户。
+- **默认打包且不可更改**：自提模式下所有菜品在选规格弹窗中，「规格」组默认选中「打包」并锁定（无法切回「堂食」），锁定组在界面显示「自提打包 · 不可修改」。
+- **无桌台下单**：自提模式 `tableId=0`、`tableNo=自提`，后端 `tableId` 仅存值不校验桌台存在，无需改表；商家端（小程序 + H5）将 `tableId=0` 的订单显示为「自提」。
+- **配套脚本**：`sql/upgrade_pickup_spec.sql` 可为尚未配置「规格」组（堂食/打包）的菜品补上规格组，使自提模式在所有菜品上生效。
 
 ### 小程序端与 H5 端差异
 - 小程序端功能与网页版商家后台保持一致（含估清下架/重新上架）；

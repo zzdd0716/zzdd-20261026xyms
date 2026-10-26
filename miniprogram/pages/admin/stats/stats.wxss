@@ -16,6 +16,33 @@
 }
 .period-item.active { background: #ff6b2c; color: #fff; font-weight: 600; }
 
+/* 自定义时间段筛选 */
+.date-filter { padding: 20rpx 24rpx; }
+.date-row { display: flex; align-items: center; justify-content: space-between; }
+.date-picker {
+  flex: 1;
+  background: #f5f7fa;
+  border-radius: 12rpx;
+  padding: 16rpx 20rpx;
+  display: flex;
+  flex-direction: column;
+}
+.date-label { font-size: 22rpx; color: #909399; margin-bottom: 4rpx; }
+.date-value { font-size: 28rpx; color: #303133; font-weight: 500; }
+.date-sep { margin: 0 16rpx; font-size: 26rpx; color: #909399; }
+.date-actions { display: flex; gap: 16rpx; margin-top: 20rpx; }
+.btn-small {
+  flex: 1;
+  text-align: center;
+  border-radius: 12rpx;
+  font-size: 26rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  box-sizing: border-box;
+}
+.btn-primary { background: #ff6b2c; color: #fff; border: 1rpx solid #ff6b2c; }
+.btn-plain { background: #fff; color: #606266; border: 1rpx solid #dcdfe6; }
+
 .summary-grid { display: flex; gap: 20rpx; padding: 0 24rpx; }
 .summary-card { flex: 1; text-align: center; }
 .summary-label { font-size: 24rpx; color: #909399; }
@@ -54,7 +81,7 @@
   flex-shrink: 0;
 }
 .sales-row:first-child .sales-rank { background: #ff6b2c; color: #fff; }
-.sales-row:nth-child(2) .sales-rank { background: #ff9a5c; color: #fff; }
+.sales-row:nth-child(2) .sales-rank { background: #ff6b2c; color: #fff; }
 .sales-row:nth-child(3) .sales-rank { background: #ffc069; color: #fff; }
 
 .sales-main { flex: 1; min-width: 0; }

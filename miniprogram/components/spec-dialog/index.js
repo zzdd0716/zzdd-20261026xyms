@@ -16,7 +16,9 @@ Component({
     unitPrice: 0,
     totalPrice: 0,
     // 视图用规格列表（每个 option 带 selected 标记，WXML 不能调用方法）
-    viewSpecs: []
+    viewSpecs: [],
+    // 锁定不可更改的规格组：{ [groupId]: true }（自提模式下的"规格=打包"）
+    lockedGroupIds: {}
   },
 
   observers: {
@@ -44,8 +46,11 @@ Component({
     /** 阻止冒泡占位 */
     noop() {},
 
-    /** 打开时初始化选择状态：单选组默认选中"冰饮/冰"（饮品习惯） */
+    /** 打开时初始化选择状态：单选组默认选中"冰饮/冰"（饮品习惯）；"规格"组默认堂食，自提模式默认打包并锁定 */
     init(dish) {
+      const app = getApp();
+      const isPickup = app.globalData.entryMode === 'pickup';
+      const lockedGroupIds = {};
       const selections = {};
       (dish.specs || []).forEach(g => {
         selections[String(g.id)] = [];
@@ -53,8 +58,14 @@ Component({
       (dish.specs || []).forEach(g => {
         const key = String(g.id);
         if (Number(g.type) === 1 && selections[key].length === 0) {
-          // 规格组默认选堂食
+          // 规格组默认选堂食；自提模式默认选打包且不可更改
           if (g.name === '规格') {
+            const pack = (g.options || []).find(o => o.name === '打包');
+            if (isPickup && pack) {
+              selections[key].push(pack.id);
+              lockedGroupIds[key] = true;
+              return;
+            }
             const dineIn = (g.options || []).find(o => o.name === '堂食');
             if (dineIn) {
               selections[key].push(dineIn.id);
@@ -66,7 +77,7 @@ Component({
           if (ice) selections[key].push(ice.id);
         }
       });
-      this.setData({ selections, qty: 1, remark: '' });
+      this.setData({ selections, qty: 1, remark: '', lockedGroupIds });
       this.buildViewSpecs();
       this.recalc();
     },
@@ -80,6 +91,7 @@ Component({
         .filter(g => g.status == null || g.status === 1) // 过滤已停用的规格组
         .map(g => ({
           ...g,
+          locked: !!this.data.lockedGroupIds[String(g.id)],
           options: (g.options || [])
             .filter(o => o.status == null || o.status === 1) // 过滤已停用的规格选项
             .map(o => ({
@@ -117,12 +129,16 @@ Component({
       return Math.round(price * 100) / 100;
     },
 
-    /** 点选/取消选项：单选互斥，多选/双拼受最多选择数限制 */
+    /** 点选/取消选项：单选互斥，多选/双拼受最多选择数限制；锁定组（自提打包）不可更改 */
     toggleOpt(e) {
       const { gid, oid } = e.currentTarget.dataset;
       const dish = this.data.dish;
       const g = (dish.specs || []).find(x => String(x.id) === String(gid));
       if (!g) return;
+      if (this.data.lockedGroupIds[String(gid)]) {
+        wx.showToast({ title: '自提订单默认打包，不可修改', icon: 'none' });
+        return;
+      }
       const key = String(gid);
       const sel = (this.data.selections[key] || []).slice();
       const idx = sel.indexOf(oid);

@@ -48,11 +48,13 @@ public interface OrderService {
 
     /**
      * 收银统计：按日/周/月/季度汇总入账（仅统计有效订单，排除已取消/已退款）
+     * 传了 startDate/endDate 则按自定义时间段查询
      */
-    CashierSummaryDTO cashierSummary(String period);
+    CashierSummaryDTO cashierSummary(String period, String startDate, String endDate);
 
     /**
      * 菜品销量统计：统计当前周期内各菜品销量（前N名 + 其余合并为"其他"）
+     * 传了 startDate/endDate 则按自定义时间段查询
      */
-    SalesSummaryDTO salesSummary(String period, Integer limit);
+    SalesSummaryDTO salesSummary(String period, Integer limit, String startDate, String endDate);
 }
