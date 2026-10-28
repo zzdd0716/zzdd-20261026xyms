@@ -22,8 +22,14 @@ public class AiProperties {
     /** 豆包 API 地址（默认兼容 OpenAI 格式） */
     private String apiUrl = "https://ark.cn-beijing.volces.com/api/v3/chat/completions";
 
-    /** 模型名称（接入点 ID） */
+    /** 模型名称（接入点 ID，对话用） */
     private String model = "";
+
+    /** Embedding模型接入点 ID（RAG向量检索用，需要单独创建接入点） */
+    private String embeddingModel = "";
+
+    /** Embedding接口地址 */
+    private String embeddingUrl = "https://ark.cn-beijing.volces.com/api/v3/embeddings";
 
     /** 只从这些分类里推荐（分类名称，逗号分隔），留空则全菜单推荐 */
     private String recommendCategories = "主食,汤粉,汤饭,例汤";

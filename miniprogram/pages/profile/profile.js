@@ -17,6 +17,7 @@ Page({
     nickname: '',
     avatar: '',
     // AI 客服
+    aiChatEnabled: true,
     chatVisible: false,
     chatHistory: [],
     chatInput: '',
@@ -37,6 +38,20 @@ Page({
       nickname: g.nickname || '微信用户',
       avatar: g.avatar || '',
       openidTail: g.openid ? g.openid.slice(-6) : ''
+    });
+    // 加载AI客服开关配置
+    this.loadAiConfig();
+  },
+
+  /** 加载AI功能开关配置 */
+  loadAiConfig() {
+    api.getAiConfig(this.data.shopId).then(config => {
+      this.setData({
+        aiChatEnabled: config.ai_chat_enabled !== false
+      });
+    }).catch(() => {
+      // 接口失败时默认显示（不影响用户使用）
+      this.setData({ aiChatEnabled: true });
     });
   },
 

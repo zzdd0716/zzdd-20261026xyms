@@ -24,7 +24,7 @@ mybatis-plus:
 
 wechat:
   appid: wx76c9ed9fd79a7c4d
-  secret: ${WECHAT_SECRET:your-wechat-secret-here}
+  secret: ${WECHAT_SECRET:your-wechat-secret}
 
 logging:
   level:
@@ -32,15 +32,17 @@ logging:
 
 # 飞书多维表格配置
 feishu:
-  app-id: ${FEISHU_APP_ID:cli_aa570eccc0b89d29}
-  app-secret: ${FEISHU_APP_SECRET:your-feishu-app-secret-here}
-  base-token: XXsubCqCzaKiVbsDOOLcAirRn8c
+  app-id: ${FEISHU_APP_ID:your-feishu-app-id}
+  app-secret: ${FEISHU_APP_SECRET:your-feishu-app-secret}
+  base-token: your-feishu-base-token
 
 # AI 功能配置（豆包大模型）
 ai:
   # 总开关：false 时 AI 接口直接返回"未开启"
   enabled: true
   # 火山引擎控制台申请的 API Key
-  api-key: ${AI_API_KEY:your-volcengine-ark-api-key}
-  # 模型名称（接入点 ID）
-  model: ep-20261025181755-qvj6z
+  api-key: ${AI_API_KEY:your-ai-api-key}
+  # 对话模型接入点 ID
+  model: your-chat-model-endpoint
+  # Embedding模型接入点 ID（RAG向量检索用）
+  embedding-model: your-embedding-model-endpoint

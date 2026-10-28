@@ -46,7 +46,7 @@ module.exports = function (n) {
   </view>
 
   <!-- AI 推荐入口 -->
-  <view class="ai-banner" bindtap="openAiDialog">
+  <view class="ai-banner" bindtap="openAiDialog" wx:if="{{aiRecommendEnabled}}">
     <text class="ai-banner-icon">🤖</text>
     <text class="ai-banner-text">不知道吃什么？AI帮你推荐</text>
     <text class="ai-banner-arrow">›</text>

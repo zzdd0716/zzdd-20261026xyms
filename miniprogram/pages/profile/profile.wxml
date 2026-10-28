@@ -29,7 +29,7 @@
       <text class="menu-arrow">›</text>
     </view>
     <view class="table-tip">根据餐桌位置上菜，请勿轻易换桌</view>
-    <view class="menu-row" bindtap="openChat">
+    <view class="menu-row" bindtap="openChat" wx:if="{{aiChatEnabled}}">
       <text class="menu-icon">💬</text>
       <text class="menu-text">智能客服</text>
       <text class="menu-arrow">›</text>

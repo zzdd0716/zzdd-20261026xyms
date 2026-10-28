@@ -32,6 +32,7 @@ Page({
     // 是否自提模式（自提码进入：默认打包不可更改）
     isPickup: false,
     // AI 推荐
+    aiRecommendEnabled: true,
     aiDialogVisible: false,
     aiPreference: '',
     aiLoading: false,
@@ -52,6 +53,20 @@ Page({
     this.setData({ tableNo: app.globalData.tableNo, isPickup: app.globalData.entryMode === 'pickup' });
     this.refreshCart();
     this.loadMenu();
+    // 加载AI推荐开关配置
+    this.loadAiConfig();
+  },
+
+  /** 加载AI功能开关配置 */
+  loadAiConfig() {
+    api.getAiConfig(app.globalData.shopId).then(config => {
+      this.setData({
+        aiRecommendEnabled: config.ai_recommend_enabled !== false
+      });
+    }).catch(() => {
+      // 接口失败时默认显示
+      this.setData({ aiRecommendEnabled: true });
+    });
   },
 
   /** 下拉刷新菜单 */

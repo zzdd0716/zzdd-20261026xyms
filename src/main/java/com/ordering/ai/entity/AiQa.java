@@ -29,6 +29,12 @@ public class AiQa {
     /** 状态：1启用 0停用 */
     private Integer status;
 
+    /** 问题向量（JSON数组，float列表） */
+    private String questionVector;
+
+    /** 向量状态：0未向量化 1已向量化 */
+    private Integer vectorStatus;
+
     private LocalDateTime createTime;
 
     private LocalDateTime updateTime;
